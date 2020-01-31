@@ -30,9 +30,9 @@ for n = 1:2
     end
     
     for i3=1:1:length(y)
-        figure(i3)
+       % figure(i3)
         dmax(i3)= max(abs(y{i3}-y0));
-        plot(time{i3}(:),y{i3}(:),'.')
+       % plot(time{i3}(:),y{i3}(:),'.')
     end
     if n==1
         err = dmax;
