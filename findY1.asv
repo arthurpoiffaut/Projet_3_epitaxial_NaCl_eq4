@@ -1,0 +1,3 @@
+function y1 = findY1(yo,vo)
+
+yi = (1-(k*dt^2)/2m)*y0 + dt*(1-(alpha*dt/2*m))*v0 - g
