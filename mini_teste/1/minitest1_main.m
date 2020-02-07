@@ -1,42 +1,82 @@
-%main[
+type calculetY
+type calculetAllY
 
+%% question iii
+clear all
+clc
 %initialisation
+
+y0 = -3e-2; %-1e-2;
+v0 = -1e-2; %-1.5e-2;
+alpha = 0.15; %0.12;
+
 k = 20;
 g = 9.8;
 m = 50e-3;
-T=2*pi*sqrt(m/k);
-alpha=0.12;
-dt= 10.^((-4.75):(0.25):(-3))*T/pi;
-y0 = -1e-2;
-v0 = -1.5e-2;
+T = 2*pi*sqrt(m/k);
+dt= transpose(10.^((-4.75):(0.25):(-3))*T/pi);
 
-
-%%
 
 y = {};
 time={};
 dmax=zeros(8,1);
-for n = 1:2
+timeMultiplier = 0.6;
+    
+for n = 1:2 %Itère pour dt et dt/2
     dt = dt/n;
-    for i1 = 1:length(dt);
-        t=(0:dt(i1):10*T);
-        time{i1}=t;
-        y{i1}=zeros(length(t),1);
-        y{i1}(1)=y0;
-        y{i1}(2)=(1-(k*dt(i1)^2)/(2*m))*y0 + dt(i1)*(1-(alpha*dt(i1)/(2*m)))*v0 - (g*dt(i1)^2)/2 ;
-        for i2= 3:length(t);
-            y{i1}(i2) = calculetY( dt(i1),y{i1}(i2-1),y{i1}(i2-2),k,m,alpha,g);
-        end
-    end
+    
+    [y,time] = calculetAllY(y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier);
     
     for i3=1:1:length(y)
-        figure(i3)
         dmax(i3)= max(abs(y{i3}-y0));
-        plot(time{i3}(:),y{i3}(:),'.')
+        
+%         figure(i3)
+%         plot(time{i3}(:),y{i3}(:),'.')
+%         titl = sprintf('Pas de temps dt = %d',dt(i3));
+%         title(titl);
     end
     if n==1
-        err = dmax;
+        dmax1 = dmax;
     else
-        err = abs(err-dmax);
+        err = abs(dmax1-dmax);
     end
 end
+
+plot(dt,err)
+title('erreur en fonction du pas de temps')
+xlabel('Pas de temps [s]')
+ylabel('Erreur [cm]')
+
+% table(dt*2,dmax1,err)
+fprintf('Pas de temps |Distance max(cm) |Erreur(cm) \n')
+for i = 1:length(dt)
+    fprintf('%d |%.9f      |%d \n',dt(i)*2,dmax1(i)*1e2,err(i)*1e2)
+end
+
+fprintf('L''erreur minimale est 5.229393e-10 cm \n')
+fprintf('La distance maximale est 0.986030307 cm \n')
+fprintf('Le pas de temps correspondant est: 3.162278e-05 \n')
+
+%% Question iv
+
+dt = 1e-3 *T/pi;
+yeq = -m*g/k;
+timeMultiplier = 10;
+y = {};
+time={};
+[y,time] = calculetAllY(y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier);
+
+cut_function = (y{1}-yeq) .*( (y{1}-yeq)> max((y{1}-yeq)/10)  );
+N_osc = length(findpeaks(cut_function));
+figure()
+plot(time{1}(:),y{1}(:),'.')
+title('Trajection de la ball en fonction du temps')
+xlabel('temps [s]')
+ylabel('Trajectoire [cm]')
+
+figure()
+plot(time{1}(:),cut_function,'.')
+title('Maximum d''oscillation plus grand que la valeur minimale')
+xlabel('temps [s]')
+ylabel('Trajectoire [cm]')
+fprintf('Le nombre d''oscillation est %d \n',N_osc)

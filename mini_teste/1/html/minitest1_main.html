@@ -1,0 +1,270 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>minitest1_main</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-04"><meta name="DC.source" content="minitest1_main.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">question iii</a></li><li><a href="#3">Question iv</a></li></ul></div><pre class="codeinput">type <span class="string">calculetY</span>
+type <span class="string">calculetAllY</span>
+</pre><pre class="codeoutput">
+function [ y ] = calculetY( dt,yi_1,yi_2,k,m,alpha,g)
+%This function calculates one it&eacute;ration of the y_i values
+
+
+y=((2*m/dt^2 - k)*yi_1 + ((alpha/2 - m/dt)/dt)*yi_2 - m*g) *  (dt/( alpha/2 + m/dt));
+
+
+end
+
+
+function [y,time] = calculetAllY( y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier)
+% This function thought all dt's and defines a y and tie vector for all of
+% them.
+
+
+for i1 = 1:length(dt)
+        t=(0:dt(i1):timeMultiplier*T);
+        time{i1}=t;
+        y{i1}=zeros(length(t),1);
+        y{i1}(1)=y0;
+        y{i1}(2)=(1-(k*dt(i1)^2)/(2*m))*y0 + dt(i1)*(1-(alpha*dt(i1)/(2*m)))*v0 - (g*dt(i1)^2)/2 ;
+        for i2= 3:length(t)
+            y{i1}(i2) = calculetY( dt(i1),y{i1}(i2-1),y{i1}(i2-2),k,m,alpha,g);
+        end
+    end
+</pre><h2 id="2">question iii</h2><pre class="codeinput">clear <span class="string">all</span>
+clc
+<span class="comment">%initialisation</span>
+
+y0 = -3e-2; <span class="comment">%-1e-2;</span>
+v0 = -1e-2; <span class="comment">%-1.5e-2;</span>
+alpha = 0.15; <span class="comment">%0.12;</span>
+
+k = 20;
+g = 9.8;
+m = 50e-3;
+T = 2*pi*sqrt(m/k);
+dt= transpose(10.^((-4.75):(0.25):(-3))*T/pi);
+
+
+y = {};
+time={};
+dmax=zeros(8,1);
+timeMultiplier = 0.6;
+
+<span class="keyword">for</span> n = 1:2 <span class="comment">%It&egrave;re pour dt et dt/2</span>
+    dt = dt/n;
+
+    [y,time] = calculetAllY(y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier);
+
+    <span class="keyword">for</span> i3=1:1:length(y)
+        dmax(i3)= max(abs(y{i3}-y0));
+
+<span class="comment">%         figure(i3)</span>
+<span class="comment">%         plot(time{i3}(:),y{i3}(:),'.')</span>
+<span class="comment">%         titl = sprintf('Pas de temps dt = %d',dt(i3));</span>
+<span class="comment">%         title(titl);</span>
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> n==1
+        dmax1 = dmax;
+    <span class="keyword">else</span>
+        err = abs(dmax1-dmax);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+plot(dt,err)
+title(<span class="string">'erreur en fonction du pas de temps'</span>)
+xlabel(<span class="string">'Pas de temps [s]'</span>)
+ylabel(<span class="string">'Erreur [cm]'</span>)
+
+<span class="comment">% table(dt*2,dmax1,err)</span>
+fprintf(<span class="string">'Pas de temps |Distance max(cm) |Erreur(cm) \n'</span>)
+<span class="keyword">for</span> i = 1:length(dt)
+    fprintf(<span class="string">'%d |%.9f      |%d \n'</span>,dt(i)*2,dmax1(i)*1e2,err(i)*1e2)
+<span class="keyword">end</span>
+
+fprintf(<span class="string">'L''erreur minimale est 5.229393e-10 cm \n'</span>)
+fprintf(<span class="string">'La distance maximale est 0.986030307 cm \n'</span>)
+fprintf(<span class="string">'Le pas de temps correspondant est: 3.162278e-05 \n'</span>)
+</pre><pre class="codeoutput">Pas de temps |Distance max(cm) |Erreur(cm) 
+1.778279e-06 |0.986029956      |4.014804e-08 
+3.162278e-06 |0.986030114      |8.172655e-07 
+5.623413e-06 |0.986030216      |3.625372e-07 
+1.000000e-05 |0.986030331      |2.670606e-08 
+1.778279e-05 |0.986030299      |6.804159e-09 
+3.162278e-05 |0.986030307      |5.229393e-10 
+5.623413e-05 |0.986030297      |2.071414e-09 
+1.000000e-04 |0.986030270      |4.613357e-09 
+L'erreur minimale est 5.229393e-10 cm 
+La distance maximale est 0.986030307 cm 
+Le pas de temps correspondant est: 3.162278e-05 
+</pre><h2 id="3">Question iv</h2><pre class="codeinput">dt = 1e-3 *T/pi;
+yeq = -m*g/k;
+timeMultiplier = 10;
+y = {};
+time={};
+[y,time] = calculetAllY(y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier);
+
+cut_function = (y{1}-yeq) .*( (y{1}-yeq)&gt; max((y{1}-yeq)/10)  );
+N_osc = length(findpeaks(cut_function));
+figure()
+plot(time{1}(:),y{1}(:),<span class="string">'.'</span>)
+title(<span class="string">'Trajection de la ball en fonction du temps'</span>)
+xlabel(<span class="string">'temps [s]'</span>)
+ylabel(<span class="string">'Trajectoire [cm]'</span>)
+
+figure()
+plot(time{1}(:),cut_function,<span class="string">'.'</span>)
+title(<span class="string">'Maximum d''oscillation plus grand que la valeur minimale'</span>)
+xlabel(<span class="string">'temps [s]'</span>)
+ylabel(<span class="string">'Trajectoire [cm]'</span>)
+fprintf(<span class="string">'Le nombre d''oscillation est %d \n'</span>,N_osc)
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+type calculetY
+type calculetAllY
+
+%% question iii
+clear all
+clc
+%initialisation
+
+y0 = -3e-2; %-1e-2;
+v0 = -1e-2; %-1.5e-2;
+alpha = 0.15; %0.12;
+
+k = 20;
+g = 9.8;
+m = 50e-3;
+T = 2*pi*sqrt(m/k);
+dt= transpose(10.^((-4.75):(0.25):(-3))*T/pi);
+
+
+y = {};
+time={};
+dmax=zeros(8,1);
+timeMultiplier = 0.6;
+    
+for n = 1:2 %Itère pour dt et dt/2
+    dt = dt/n;
+    
+    [y,time] = calculetAllY(y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier);
+    
+    for i3=1:1:length(y)
+        dmax(i3)= max(abs(y{i3}-y0));
+        
+%         figure(i3)
+%         plot(time{i3}(:),y{i3}(:),'.')
+%         titl = sprintf('Pas de temps dt = %d',dt(i3));
+%         title(titl);
+    end
+    if n==1
+        dmax1 = dmax;
+    else
+        err = abs(dmax1-dmax);
+    end
+end
+
+plot(dt,err)
+title('erreur en fonction du pas de temps')
+xlabel('Pas de temps [s]')
+ylabel('Erreur [cm]')
+
+% table(dt*2,dmax1,err)
+fprintf('Pas de temps |Distance max(cm) |Erreur(cm) \n')
+for i = 1:length(dt)
+    fprintf('%d |%.9f      |%d \n',dt(i)*2,dmax1(i)*1e2,err(i)*1e2)
+end
+
+fprintf('L''erreur minimale est 5.229393e-10 cm \n')
+fprintf('La distance maximale est 0.986030307 cm \n')
+fprintf('Le pas de temps correspondant est: 3.162278e-05 \n')
+
+%% Question iv
+
+dt = 1e-3 *T/pi;
+yeq = -m*g/k;
+timeMultiplier = 10;
+y = {};
+time={};
+[y,time] = calculetAllY(y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier);
+
+cut_function = (y{1}-yeq) .*( (y{1}-yeq)> max((y{1}-yeq)/10)  );
+N_osc = length(findpeaks(cut_function));
+figure()
+plot(time{1}(:),y{1}(:),'.')
+title('Trajection de la ball en fonction du temps')
+xlabel('temps [s]')
+ylabel('Trajectoire [cm]')
+
+figure()
+plot(time{1}(:),cut_function,'.')
+title('Maximum d''oscillation plus grand que la valeur minimale')
+xlabel('temps [s]')
+ylabel('Trajectoire [cm]')
+fprintf('Le nombre d''oscillation est %d \n',N_osc)
+
+##### SOURCE END #####
+--></body></html>
