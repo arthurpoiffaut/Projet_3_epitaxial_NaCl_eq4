@@ -28,12 +28,18 @@ for n = 1:2 %Itère pour dt et dt/2
     [y,time] = calculetAllY(y,time,y0,v0,dt,T,k,m,alpha,g,timeMultiplier);
     
     for i3=1:1:length(y)
+<<<<<<< HEAD
         dmax(i3)= max(abs(y{i3}-y0));
         
 %         figure(i3)
 %         plot(time{i3}(:),y{i3}(:),'.')
 %         titl = sprintf('Pas de temps dt = %d',dt(i3));
 %         title(titl);
+=======
+       % figure(i3)
+        dmax(i3)= max(abs(y{i3}-y0));
+       % plot(time{i3}(:),y{i3}(:),'.')
+>>>>>>> master
     end
     if n==1
         dmax1 = dmax;
