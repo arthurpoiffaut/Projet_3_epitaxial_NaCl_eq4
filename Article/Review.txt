@@ -1,21 +1,25 @@
 Chatterjee-Vlachos2007_Article_AnOverviewOfSpatialMicroscopic
 -Super long (56 pages)
--parle de la méthode de monte carlo
+-parle de la mï¿½thode de monte carlo
 -comparaison d'implemtation et de cout de compuation de different vaariaiton de KMC
--Peut-etre pertinent plus tard, comme source supplémentaire
+-Peut-etre pertinent plus tard, comme source supplï¿½mentaire
 -pas une base pour le projet
 
 hastings1998
 -traite de filet/toile bidimendisionnelle
 -pas vraiment rapport aavec le projet
--peut etre mentionné dans le rapport comme technique alternatie
+-peut etre mentionnï¿½ dans le rapport comme technique alternatie
 
 merks2003_ Models of coral growth: spontaneous branching, compactification
 and the Laplacian growth assumption
--modélisation de la croissacnde  de coral
--équation de courbure
--Marche avec notre projet, mais trop compliqué
--À mentionné dans le rapport, comme technique alternative
+-modï¿½lisation de la croissacnde  de coral
+-ï¿½quation de courbure
+-Marche avec notre projet, mais trop compliquï¿½
+-ï¿½ mentionnï¿½ dans le rapport, comme technique alternative
 
 PhysRevB.27.5686 _ Diffusion-limited aggregation
 -
+
+Theory and simulation of crystal growth - Levi,Kotrla
+-mention mÃ©thode molecular dynamic et Monte Carlo cinetique
+-et dit un peu pourquoi MD pas optimal Section 3 debut
