@@ -8,7 +8,7 @@ clear
 % dans un mur d'isolation thermique
 L=0.3; %m ; Épaisseur du mur
 
-k=1;h=1; %Mini quiz 4, 2016
+k=1;h=10; %Mini quiz 4, 2016
 % k=1;%W/(m*K); La conductivité thermique de la brique
 % h=1; %W/(m^2*K); Coefficient de transfert thermique pour l'interface plane entre l'air et solide.
 
@@ -38,7 +38,7 @@ for N=Nar
     
     % Sourse volumique de chaleur q[W/m^3] d'épaisseur dL
     % La source est intégrée dans la partie intérieure du mur
-    dL=0.05; 
+    dL=0.10; 
     q=2000;% W/m^3;
     S=q.*heaviside(x-(L-dL));
     
@@ -65,7 +65,7 @@ for N=Nar
     Tmax=[Tmax max(u)];
 end
 
-axis([x(1) x(end) Ta 25])
+axis([x(1) x(end) Ta 30])
 xlabel('x [m]')
 ylabel('T_{eq}(x) [^oC]')
 hold
