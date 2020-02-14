@@ -40,7 +40,7 @@ for N=Nar
     % La source est intégrée dans la partie intérieure du mur
     dL=0.05; 
     q=2000;% W/m^3;
-    S=q.*exp(-((x-L)/dL).^2);
+    S=q.*heaviside(x-(L-dL));
     
     if (0)
         % matrice pleine
