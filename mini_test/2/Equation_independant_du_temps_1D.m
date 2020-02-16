@@ -1,26 +1,26 @@
 clear 
-% Équation différentielle: d^2 u/dx^2=g(x) sur x=(a,b)
-% Conditions aux limites générales:
+% ï¿½quation diffï¿½rentielle: d^2 u/dx^2=g(x) sur x=(a,b)
+% Conditions aux limites gï¿½nï¿½rales:
 % x=a: c1*du/dx+c2*u+c3=0
 % x=b: d1*du/dx+d2*u+d3=0
 
-% Équation de transfert de chaleur d^2 T/dx^2=-S(x)/k sur x=(0,L)
+% ï¿½quation de transfert de chaleur d^2 T/dx^2=-S(x)/k sur x=(0,L)
 % dans un mur d'isolation thermique
-L=0.3; %m ; Épaisseur du mur
+L=0.3; %m ; ï¿½paisseur du mur
 
 k=1;h=10; %Mini quiz 4, 2016
-% k=1;%W/(m*K); La conductivité thermique de la brique
+% k=1;%W/(m*K); La conductivitï¿½ thermique de la brique
 % h=1; %W/(m^2*K); Coefficient de transfert thermique pour l'interface plane entre l'air et solide.
 
-% Condition convective (de Robin) à x=0 (face externe du mur): -k*dT/dx=h(Ta-T)
+% Condition convective (de Robin) ï¿½ x=0 (face externe du mur): -k*dT/dx=h(Ta-T)
 Ta=-10; %oC
 c1=-k; c2=h; c3=-h*Ta;
 % Condition de Robin
 Ti=20;
 d1=-k; d2=-h; d3=h*Ti;
 
-%(N+1) nœuds dans la maille
-% Nmax=10000 pour 1G de mémoire
+%(N+1) nï¿½uds dans la maille
+% Nmax=10000 pour 1G de mï¿½moire
 
 Nar1=[100]; %dx=3mm
 %Nar1=[2:10 20:10:100];% 200:100:2000 3000:1000:5000]; % Matrice pleine
@@ -33,11 +33,11 @@ ci=0;Tmax=[];figure(1);time=[];
 for N=Nar
     display(N)
     ci=ci+1;
-    dx=L/N; %Pas de discrétisation
+    dx=L/N; %Pas de discrï¿½tisation
     x=(0:dx:L)';
     
-    % Sourse volumique de chaleur q[W/m^3] d'épaisseur dL
-    % La source est intégrée dans la partie intérieure du mur
+    % Sourse volumique de chaleur q[W/m^3] d'ï¿½paisseur dL
+    % La source est intï¿½grï¿½e dans la partie intï¿½rieure du mur
     dL=0.10; 
     q=2000;% W/m^3;
     S=q.*heaviside(x-(L-dL));
