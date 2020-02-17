@@ -102,18 +102,32 @@ ylabel('temps [s]')
 
 Tmax_eq=Tmax(end-1);
 
-%%
+%% Méthode dépendante du temps
+
+% Initialisation des paramètres
+A = AReal;
+dx = dxReal;
+N =100;
+alpha = Cv*rho/k;
+dt = 1* (alpha*dx^2);
+b= S/k; b(1)=2*c3/dx; b(N+1)=2*d3/dx;
+t_final = 10e6;
+
+x=(0:dx:L)';
+S=q.*heaviside(x-(L-dL));
+P = t_final/dt;
+
 M = diag(ones(1,N+1));
 M(1,1) = 0;
 M(end,end) = 0;
 M = sparse(M);
 
-A = AReal
-dx = dxReal
+%Calcul de la matrice U
+U = ones(N+1);
+U(:,1) = Ta*ones(N+1,1);
+for i = 1:P
+    U(:,i+1) = getUp1(U(:,i),b,A,M,ksi,dx,dt,alpha);
+end
 
-alpha = Cv*rho/k
-dt = 1* (alpha*dx^2)
-
-
-
+disp('yeet')
 
