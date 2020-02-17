@@ -12,6 +12,16 @@ k=1;h=10; %Mini quiz 4, 2016
 % k=1;%W/(m*K); La conductivité thermique de la brique
 % h=1; %W/(m^2*K); Coefficient de transfert thermique pour l'interface plane entre l'air et solide.
 
+
+ksi = 0.5;
+Cv = 1000;
+rho = 2000;
+
+dL=0.10; 
+q=2000;% W/m^3;
+
+
+
 % Condition convective (de Robin) à x=0 (face externe du mur): -k*dT/dx=h(Ta-T)
 Ta=-10; %oC
 c1=-k; c2=h; c3=-h*Ta;
@@ -22,9 +32,6 @@ d1=-k; d2=-h; d3=h*Ti;
 %(N+1) nœuds dans la maille
 % Nmax=10000 pour 1G de mémoire
 
-ksi = 0.5;
-Cv = 1000;
-rho = 2000;
 
 Nar1=[100]; %dx=3mm
 %Nar1=[2:10 20:10:100];% 200:100:2000 3000:1000:5000]; % Matrice pleine
@@ -43,8 +50,6 @@ for N=Nar
     
     % Sourse volumique de chaleur q[W/m^3] d'épaisseur dL
     % La source est intégrée dans la partie intérieure du mur
-    dL=0.10; 
-    q=2000;% W/m^3;
     S=q.*heaviside(x-(L-dL));
     
     if (0)
@@ -96,8 +101,8 @@ M(end,end) = 0;
 M = sparse(M);
 
 alpha = Cv*rho/k
-dt = 0.5*(alpha*dx^2)
+dt = 1* (alpha*dx^2)
 
-g = 
+
 
 
