@@ -110,11 +110,13 @@ dx = dxReal;
 N =100;
 alpha = Cv*rho/k;
 dt = 1* (alpha*dx^2);
+x=(0:dx:L)';
+S=q.*heaviside(x-(L-dL));
 b= -S/k; b(1)=-2*c3/dx; b(N+1)=-2*d3/dx;
 t_final = 10e5;
 
-x=(0:dx:L)';
-S=q.*heaviside(x-(L-dL));
+
+
 P = t_final/dt;
 
 M = diag(ones(1,N+1));
@@ -130,4 +132,9 @@ for i = 1:P
 end
 
 disp('yeet')
+
+TmaxTau = max(U(:,1)) + 0.99*(Tmax_eq - max(U(:,1)));
+
+
+
 
