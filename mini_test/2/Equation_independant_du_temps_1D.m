@@ -103,15 +103,15 @@ ylabel('temps [s]')
 Tmax_eq=Tmax(end-1);
 
 %% Méthode dépendante du temps
-
+clc
 % Initialisation des paramètres
 A = AReal;
 dx = dxReal;
 N =100;
 alpha = Cv*rho/k;
 dt = 1* (alpha*dx^2);
-b= S/k; b(1)=2*c3/dx; b(N+1)=2*d3/dx;
-t_final = 10e6;
+b= -S/k; b(1)=-2*c3/dx; b(N+1)=-2*d3/dx;
+t_final = 10e5;
 
 x=(0:dx:L)';
 S=q.*heaviside(x-(L-dL));
