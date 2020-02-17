@@ -40,12 +40,16 @@ Nar1=[100]; %dx=3mm
 Nar(1:2:2*length(Nar1)-1)=Nar1;
 Nar(2:2:2*length(Nar1))=2*Nar1;
 
+
 %%
 ci=0;Tmax=[];figure(1);time=[];
 for N=Nar
     display(N)
     ci=ci+1;
-    dx=L/N; %Pas de discrétisation
+    dx=L/N; %Pas de discrétisationà
+    if N ==100
+        dxReal = dx;
+    end
     x=(0:dx:L)';
     
     % Sourse volumique de chaleur q[W/m^3] d'épaisseur dL
@@ -66,6 +70,10 @@ for N=Nar
     A(1,1)=2*c2*dx-3*c1;A(1,2)=4*c1;A(1,3)=-c1;
     A(N+1,N+1)=3*d1+2*d2*dx;A(N+1,N)=-4*d1;A(N+1,N-1)=d1;
     b=-S/k*dx^2; b(1)=-2*c3*dx; b(N+1)=-2*d3*dx;
+    
+    if N ==100
+        AReal = A;
+    end
     
     tic
     u=A\b;
@@ -99,6 +107,9 @@ M = diag(ones(1,N+1));
 M(1,1) = 0;
 M(end,end) = 0;
 M = sparse(M);
+
+A = AReal
+dx = dxReal
 
 alpha = Cv*rho/k
 dt = 1* (alpha*dx^2)
