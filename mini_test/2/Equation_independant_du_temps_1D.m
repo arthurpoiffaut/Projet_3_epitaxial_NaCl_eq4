@@ -136,5 +136,18 @@ disp('yeet')
 TmaxTau = max(U(:,1)) + 0.99*(Tmax_eq - max(U(:,1)));
 
 
+MaxU=max(U);
 
+
+i=1;
+while MaxU(i) <= TmaxTau
+    i=i+1;    
+end
+Result=i-1; %(i-1) car on a fait i+1 lorsqu'on avait MaxU(i)=TmaxTau
+
+Tau = Result*dt %(s)
+
+
+            
+        
 
