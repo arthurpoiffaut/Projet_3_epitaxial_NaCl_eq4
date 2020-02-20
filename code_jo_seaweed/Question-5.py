@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import time as time
 
 TempsI=time.clock()#Temps initial
-tabM=[2500,5000,10000,20000]#Tableau pour différents nombre de marcheur
-plt.figure(4,figsize=(10,5))
+tabM=[5000]#Tableau pour différents nombre de marcheur
+plt.figure(4,figsize=(20,10))
 
 
 for i in tabM:#Boucle pour tracer figure avec différent nombres de marcheurs
@@ -20,7 +20,7 @@ for i in tabM:#Boucle pour tracer figure avec différent nombres de marcheurs
     
     statusMobile=np.ones(M,dtype='bool') # True pour marcheur mobile
     grilleFixe=np.zeros([N+2,N+2],dtype='bool') # True pour marcheur fixe
-    grilleFixe[:,0]=True #sites collants a y=0, au bas du reseau
+    grilleFixe[125,125]=True #sites collants a y=0, au bas du reseau
     
     TabFixe=[]#Liste pour ajouter nombre marcheur fixe
     nFixe=0 # nombre de marcheurs fixes
