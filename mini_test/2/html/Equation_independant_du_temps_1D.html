@@ -1,0 +1,418 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Equation_independant_du_temps_1D</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-18"><meta name="DC.source" content="Equation_independant_du_temps_1D.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">M&eacute;thode d&eacute;pendante du temps</a></li></ul></div><pre class="codeinput">clear
+<span class="comment">% &Eacute;quation diff&eacute;rentielle: d^2 u/dx^2=g(x) sur x=(a,b)</span>
+<span class="comment">% Conditions aux limites g&eacute;n&eacute;rales:</span>
+<span class="comment">% x=a: c1*du/dx+c2*u+c3=0</span>
+<span class="comment">% x=b: d1*du/dx+d2*u+d3=0</span>
+
+<span class="comment">% &Eacute;quation de transfert de chaleur d^2 T/dx^2=-S(x)/k sur x=(0,L)</span>
+<span class="comment">% dans un mur d'isolation thermique</span>
+L=0.3; <span class="comment">%m ; &Eacute;paisseur du mur</span>
+
+k=1;h=10; <span class="comment">%Mini quiz 4, 2016</span>
+<span class="comment">% k=1;%W/(m*K); La conductivit&eacute; thermique de la brique</span>
+<span class="comment">% h=1; %W/(m^2*K); Coefficient de transfert thermique pour l'interface plane entre l'air et solide.</span>
+
+
+ksi = 0.5;
+Cv = 1000;
+rho = 2000;
+
+dL=0.10;
+q=2000;<span class="comment">% W/m^3;</span>
+
+
+
+<span class="comment">% Condition convective (de Robin) &agrave; x=0 (face externe du mur): -k*dT/dx=h(Ta-T)</span>
+Ta=-10; <span class="comment">%oC</span>
+c1=-k; c2=h; c3=-h*Ta;
+<span class="comment">% Condition de Robin</span>
+Ti=20;
+d1=-k; d2=-h; d3=h*Ti;
+
+<span class="comment">%(N+1) n&#339;uds dans la maille</span>
+<span class="comment">% Nmax=10000 pour 1G de m&eacute;moire</span>
+
+
+Nar1=[100]; <span class="comment">%dx=3mm</span>
+<span class="comment">%Nar1=[2:10 20:10:100];% 200:100:2000 3000:1000:5000]; % Matrice pleine</span>
+<span class="comment">%Nar1=[2:10 20:10:100 200:100:2000 3000:1000:4000 5000:5000:100000]; %Matrice creuse</span>
+
+Nar(1:2:2*length(Nar1)-1)=Nar1;
+Nar(2:2:2*length(Nar1))=2*Nar1;
+</pre><pre class="codeinput">ci=0;Tmax=[];figure(1);time=[];
+<span class="keyword">for</span> N=Nar
+    display(N)
+    ci=ci+1;
+    dx=L/N; <span class="comment">%Pas de discr&eacute;tisation&agrave;</span>
+    <span class="keyword">if</span> N ==100
+        dxReal = dx;
+    <span class="keyword">end</span>
+    x=(0:dx:L)';
+
+    <span class="comment">% Sourse volumique de chaleur q[W/m^3] d'&eacute;paisseur dL</span>
+    <span class="comment">% La source est int&eacute;gr&eacute;e dans la partie int&eacute;rieure du mur</span>
+    S=q.*heaviside(x-(L-dL));
+
+    <span class="keyword">if</span> (0)
+        <span class="comment">% matrice pleine</span>
+        A=diag(-2*ones(1,N+1),0)+diag(ones(1,N),-1)+diag(ones(1,N),1);
+    <span class="keyword">else</span>
+
+        <span class="comment">% matrice creuse</span>
+        i=[(1:N+1) (1:N) (2:N+1)];
+        j=[(1:N+1) (2:N+1) (1:N)];
+        s=[-2*ones(1,N+1) ones(1,N) ones(1,N)];
+        A=sparse(i,j,s,N+1,N+1);
+    <span class="keyword">end</span>
+    A(1,1)=2*c2*dx-3*c1;A(1,2)=4*c1;A(1,3)=-c1;
+    A(N+1,N+1)=3*d1+2*d2*dx;A(N+1,N)=-4*d1;A(N+1,N-1)=d1;
+    b=-S/k*dx^2; b(1)=-2*c3*dx; b(N+1)=-2*d3*dx;
+
+    <span class="keyword">if</span> N ==100
+        AReal = A;
+    <span class="keyword">end</span>
+
+    tic
+    u=A\b;
+    time=[time toc];
+
+    plot(x,u); <span class="keyword">if</span> (ci==1) hold; <span class="keyword">end</span>
+    Tmax=[Tmax max(u)];
+<span class="keyword">end</span>
+
+axis([x(1) x(end) Ta 30])
+xlabel(<span class="string">'x [m]'</span>)
+ylabel(<span class="string">'T_{eq}(x) [^oC]'</span>)
+title(<span class="string">'Distribution de Temp&eacute;rature d''&eacute;quilibre'</span>)
+hold
+
+Err=abs(Tmax(1:2:end)-Tmax(2:2:end));
+
+figure(2)
+loglog(L./Nar1,Err,<span class="string">'o'</span>)
+xlabel(<span class="string">'dx'</span>)
+ylabel(<span class="string">'Err(dx)=|Tmax(dx)-Tmax(dx/2)|'</span>)
+title(<span class="string">'Erreur sur la temp&eacute;rature max de l''&eacute;quilibre'</span>)
+
+figure(3)
+loglog(Nar,time,<span class="string">':o'</span>)
+xlabel(<span class="string">'N'</span>)
+ylabel(<span class="string">'temps [s]'</span>)
+title(<span class="string">'Temps de calcul en fonction du pas'</span>)
+
+Tmax_eq=Tmax(end-1);
+</pre><pre class="codeoutput">
+N =
+
+   100
+
+Current plot held
+
+N =
+
+   200
+
+Current plot released
+</pre><img vspace="5" hspace="5" src="Equation_independant_du_temps_1D_01.png" alt=""> <img vspace="5" hspace="5" src="Equation_independant_du_temps_1D_02.png" alt=""> <img vspace="5" hspace="5" src="Equation_independant_du_temps_1D_03.png" alt=""> <h2 id="3">M&eacute;thode d&eacute;pendante du temps</h2><pre class="codeinput">clc
+<span class="comment">% Initialisation des param&egrave;tres</span>
+A = AReal;
+dx = dxReal;
+N =100;
+alpha = Cv*rho/k;
+dt = 1* (alpha*dx^2);
+x=(0:dx:L)';
+S=q.*heaviside(x-(L-dL));
+b= -S/k; b(1)=-2*c3/dx; b(N+1)=-2*d3/dx;
+t_final = 10e5;
+
+type <span class="string">getUp1.m</span>
+
+P = t_final/dt;
+
+M = diag(ones(1,N+1));
+M(1,1) = 0;
+M(end,end) = 0;
+M = sparse(M);
+
+<span class="comment">%Calcul de la matrice U</span>
+U = ones(N+1);
+U(:,1) = Ta*ones(N+1,1);
+
+
+
+<span class="keyword">for</span> i = 1:P
+    U(:,i+1) = getUp1(U(:,i),b,A,M,ksi,dx,dt,alpha);
+<span class="keyword">end</span>
+
+
+TmaxTau = max(U(:,1)) + 0.99*(Tmax_eq - max(U(:,1)));
+
+
+MaxU=max(U);
+
+
+i=1;
+<span class="keyword">while</span> MaxU(i) &lt;= TmaxTau
+    i=i+1;
+<span class="keyword">end</span>
+Result=i-1; <span class="comment">%(i-1) car on a fait i+1 lorsqu'on avait MaxU(i)=TmaxTau</span>
+
+Tau = Result*dt; <span class="comment">%(s)</span>
+
+fprintf(<span class="string">'La valeur du pas d''espace est %.3e m \n'</span>,dx)
+fprintf(<span class="string">'La valeur du pas de temps est %.3e s \n'</span>,dt)
+fprintf(<span class="string">'La temp&eacute;rature d''&eacute;quilibre est %.3e C \n'</span>,Tmax_eq)
+fprintf(<span class="string">'Erreur sur la temp&eacute;rature d''&eacute;quilibre est %.3e C \n'</span>,Err)
+fprintf(<span class="string">'La valeur de temps d''&eacute;quilibrage est %.3e s \n'</span>,Tau)
+</pre><pre class="codeoutput">
+function U = getUp1(Up,b,A,M,ksi,dx,dt,alpha)
+
+U1 =  (M - ksi.*dt./(alpha*dx^2).*A);
+U2 =   (M+ ((1-ksi).*dt./(alpha*dx^2)).*A)*Up ;
+U3 = (dt/alpha).*(b) ;
+
+U = U1\(U2-U3);
+
+end
+La valeur du pas d'espace est 3.000e-03 m 
+La valeur du pas de temps est 1.800e+01 s 
+La temp&eacute;rature d'&eacute;quilibre est 2.968e+01 C 
+Erreur sur la temp&eacute;rature d'&eacute;quilibre est 1.252e-01 C 
+La valeur de temps d'&eacute;quilibrage est 1.911e+05 s 
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+clear 
+% Équation différentielle: d^2 u/dx^2=g(x) sur x=(a,b)
+% Conditions aux limites générales:
+% x=a: c1*du/dx+c2*u+c3=0
+% x=b: d1*du/dx+d2*u+d3=0
+
+% Équation de transfert de chaleur d^2 T/dx^2=-S(x)/k sur x=(0,L)
+% dans un mur d'isolation thermique
+L=0.3; %m ; Épaisseur du mur
+
+k=1;h=10; %Mini quiz 4, 2016
+% k=1;%W/(m*K); La conductivité thermique de la brique
+% h=1; %W/(m^2*K); Coefficient de transfert thermique pour l'interface plane entre l'air et solide.
+
+
+ksi = 0.5;
+Cv = 1000;
+rho = 2000;
+
+dL=0.10; 
+q=2000;% W/m^3;
+
+
+
+% Condition convective (de Robin) à x=0 (face externe du mur): -k*dT/dx=h(Ta-T)
+Ta=-10; %oC
+c1=-k; c2=h; c3=-h*Ta;
+% Condition de Robin
+Ti=20;
+d1=-k; d2=-h; d3=h*Ti;
+
+%(N+1) nœuds dans la maille
+% Nmax=10000 pour 1G de mémoire
+
+
+Nar1=[100]; %dx=3mm
+%Nar1=[2:10 20:10:100];% 200:100:2000 3000:1000:5000]; % Matrice pleine
+%Nar1=[2:10 20:10:100 200:100:2000 3000:1000:4000 5000:5000:100000]; %Matrice creuse
+
+Nar(1:2:2*length(Nar1)-1)=Nar1;
+Nar(2:2:2*length(Nar1))=2*Nar1;
+
+
+%%
+ci=0;Tmax=[];figure(1);time=[];
+for N=Nar
+    display(N)
+    ci=ci+1;
+    dx=L/N; %Pas de discrétisationà
+    if N ==100
+        dxReal = dx;
+    end
+    x=(0:dx:L)';
+    
+    % Sourse volumique de chaleur q[W/m^3] d'épaisseur dL
+    % La source est intégrée dans la partie intérieure du mur
+    S=q.*heaviside(x-(L-dL));
+    
+    if (0)
+        % matrice pleine
+        A=diag(-2*ones(1,N+1),0)+diag(ones(1,N),-1)+diag(ones(1,N),1);
+    else
+        
+        % matrice creuse
+        i=[(1:N+1) (1:N) (2:N+1)];
+        j=[(1:N+1) (2:N+1) (1:N)];
+        s=[-2*ones(1,N+1) ones(1,N) ones(1,N)];
+        A=sparse(i,j,s,N+1,N+1);
+    end
+    A(1,1)=2*c2*dx-3*c1;A(1,2)=4*c1;A(1,3)=-c1;
+    A(N+1,N+1)=3*d1+2*d2*dx;A(N+1,N)=-4*d1;A(N+1,N-1)=d1;
+    b=-S/k*dx^2; b(1)=-2*c3*dx; b(N+1)=-2*d3*dx;
+    
+    if N ==100
+        AReal = A;
+    end
+    
+    tic
+    u=A\b;
+    time=[time toc];
+    
+    plot(x,u); if (ci==1) hold; end
+    Tmax=[Tmax max(u)];
+end
+
+axis([x(1) x(end) Ta 30])
+xlabel('x [m]')
+ylabel('T_{eq}(x) [^oC]')
+title('Distribution de Température d''équilibre')
+hold
+
+Err=abs(Tmax(1:2:end)-Tmax(2:2:end));
+
+figure(2)
+loglog(L./Nar1,Err,'o')
+xlabel('dx')
+ylabel('Err(dx)=|Tmax(dx)-Tmax(dx/2)|')
+title('Erreur sur la température max de l''équilibre')
+
+figure(3)
+loglog(Nar,time,':o')
+xlabel('N')
+ylabel('temps [s]')
+title('Temps de calcul en fonction du pas')
+
+Tmax_eq=Tmax(end-1);
+
+%% Méthode dépendante du temps
+clc
+% Initialisation des paramètres
+A = AReal;
+dx = dxReal;
+N =100;
+alpha = Cv*rho/k;
+dt = 1* (alpha*dx^2);
+x=(0:dx:L)';
+S=q.*heaviside(x-(L-dL));
+b= -S/k; b(1)=-2*c3/dx; b(N+1)=-2*d3/dx;
+t_final = 10e5;
+
+type getUp1.m
+
+P = t_final/dt;
+
+M = diag(ones(1,N+1));
+M(1,1) = 0;
+M(end,end) = 0;
+M = sparse(M);
+
+%Calcul de la matrice U
+U = ones(N+1);
+U(:,1) = Ta*ones(N+1,1);
+
+
+
+for i = 1:P
+    U(:,i+1) = getUp1(U(:,i),b,A,M,ksi,dx,dt,alpha);
+end
+
+
+TmaxTau = max(U(:,1)) + 0.99*(Tmax_eq - max(U(:,1)));
+
+
+MaxU=max(U);
+
+
+i=1;
+while MaxU(i) <= TmaxTau
+    i=i+1;    
+end
+Result=i-1; %(i-1) car on a fait i+1 lorsqu'on avait MaxU(i)=TmaxTau
+
+Tau = Result*dt; %(s)
+
+fprintf('La valeur du pas d''espace est %.3e m \n',dx)
+fprintf('La valeur du pas de temps est %.3e s \n',dt)
+fprintf('La température d''équilibre est %.3e C \n',Tmax_eq)
+fprintf('Erreur sur la température d''équilibre est %.3e C \n',Err)
+fprintf('La valeur de temps d''équilibrage est %.3e s \n',Tau)
+
+
+            
+        
+
+
+##### SOURCE END #####
+--></body></html>

@@ -8,18 +8,16 @@ clear
 % dans un mur d'isolation thermique
 L=0.3; %m ; Épaisseur du mur
 
-k=1;h=10; %Mini quiz 4, 2016
+k=1;h=30; %Mini quiz 4, 2016
 % k=1;%W/(m*K); La conductivité thermique de la brique
 % h=1; %W/(m^2*K); Coefficient de transfert thermique pour l'interface plane entre l'air et solide.
+ksi = 0.65;
+rho = 3000;
+dL=0.20;
 
-
-ksi = 0.5;
-Cv = 1000;
-rho = 2000;
-
-dL=0.10; 
+ 
 q=2000;% W/m^3;
-
+Cv = 1000;
 
 
 % Condition convective (de Robin) à x=0 (face externe du mur): -k*dT/dx=h(Ta-T)
@@ -86,6 +84,7 @@ end
 axis([x(1) x(end) Ta 30])
 xlabel('x [m]')
 ylabel('T_{eq}(x) [^oC]')
+title('Distribution de Température d''équilibre')
 hold
 
 Err=abs(Tmax(1:2:end)-Tmax(2:2:end));
@@ -94,11 +93,13 @@ figure(2)
 loglog(L./Nar1,Err,'o')
 xlabel('dx')
 ylabel('Err(dx)=|Tmax(dx)-Tmax(dx/2)|')
+title('Erreur sur la température max de l''équilibre')
 
 figure(3)
 loglog(Nar,time,':o')
 xlabel('N')
 ylabel('temps [s]')
+title('Temps de calcul en fonction du pas')
 
 Tmax_eq=Tmax(end-1);
 
@@ -113,9 +114,9 @@ dt = 1* (alpha*dx^2);
 x=(0:dx:L)';
 S=q.*heaviside(x-(L-dL));
 b= -S/k; b(1)=-2*c3/dx; b(N+1)=-2*d3/dx;
-t_final = 10e5;
+t_final = 10e6;
 
-
+type getUp1.m
 
 P = t_final/dt;
 
@@ -127,11 +128,13 @@ M = sparse(M);
 %Calcul de la matrice U
 U = ones(N+1);
 U(:,1) = Ta*ones(N+1,1);
+
+
+
 for i = 1:P
     U(:,i+1) = getUp1(U(:,i),b,A,M,ksi,dx,dt,alpha);
 end
 
-disp('yeet')
 
 TmaxTau = max(U(:,1)) + 0.99*(Tmax_eq - max(U(:,1)));
 
@@ -145,7 +148,25 @@ while MaxU(i) <= TmaxTau
 end
 Result=i-1; %(i-1) car on a fait i+1 lorsqu'on avait MaxU(i)=TmaxTau
 
-Tau = Result*dt %(s)
+Tau = Result*dt; %(s)
+
+fprintf('La valeur du pas d''espace est %.3e m \n',dx)
+fprintf('La valeur du pas de temps est %.3e s \n',dt)
+fprintf('La température d''équilibre est %.3e C \n',Tmax_eq)
+fprintf('Erreur sur la température d''équilibre est %.3e C \n',Err)
+fprintf('La valeur de temps d''équilibrage est %.3e s \n',Tau)
+
+figure(4)
+timeVec = 0:dt:t_final;
+plot(timeVec,MaxU)
+hold
+plot(timeVec,TmaxTau*ones(1,length(timeVec)))
+hold
+xlabel('t [s]')
+ylabel('Tmax(t) [C]')
+title('Température maximale en fonction du temps')
+legend('Temp. max (t)','Temp. de tau','location','best')
+
 
 
             
