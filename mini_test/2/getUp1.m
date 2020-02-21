@@ -1,3 +1,9 @@
-function U = getUp1(Up,gp1,gp,A,M,ksi,dx,dt)
+function U = getUp1(Up,b,A,M,ksi,dx,dt,alpha)
 
-U = ( (M - ksi*dt/(alpha*dx^2))\ ((M+ ((1-ksi)*dt/(alpha*dx^2))*A)*Up - (dt/alpha)*(ksi*gp1 + (1-ksi)*gp) ));
+U1 =  (M - ksi.*dt./(alpha*dx^2).*A);
+U2 =   (M+ ((1-ksi).*dt./(alpha*dx^2)).*A)*Up ;
+U3 = (dt/alpha).*(b) ;
+
+U = U1\(U2-U3);
+
+end
