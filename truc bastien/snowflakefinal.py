@@ -13,7 +13,7 @@ maxIt = 250 #maximal iteration of growth steps
 mx = 251 #width 
 my = 251 #and height of the snowflake arrays
 
-rho = 0.6 #water vapor
+rho = 0.7 #water vapor
 gamma = 0.0000005 #constant influence from the third dim. which can be understood 
                 #similar as the vapor,
                 #but from the normal dimension of the snowflake
@@ -79,7 +79,7 @@ def average(i,j,dx,dy,alpha):
 #for loops over all the sites (i and j) and the number of iteration
   
 for g in range(maxIt):
-    print("step " + str(g+1) + " out of " + str(maxIt)) 
+    #print("step " + str(g+1) + " out of " + str(maxIt)) 
 
     for i in range(mx):
         for j in range(my):
