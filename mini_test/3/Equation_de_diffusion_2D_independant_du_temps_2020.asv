@@ -29,11 +29,11 @@ h=1; %W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieures
 % Paramètres de l'air qui remplit l'appartement
 ka=0.024;
 
-
+delta = 25e-2; %[m]
 
 
 d_ar=[];tini_ar=[];tinv_ar=[];mem_ar=[];Tm_ar=[];tempMileu=[];
-for fact=10e-2 * [10 5 2.5]
+for fact=[2*delta delta]
     d=0.1*fact; %Pas de discrétisation en [m]
     d_ar=[d_ar d];
     Nx=round(Lx/d)+1;
@@ -263,15 +263,15 @@ for fact=10e-2 * [10 5 2.5]
         end
     M = sparse(M);
     end
-    tini_ar=[tini_ar toc];
+    tini_ar=[tini_ar toc]
     
     tic
     %T=M\b;
     [L,U]=lu(M);T=U\(L\b);
 
-    tinv_ar=[tinv_ar toc];
+    tinv_ar=[tinv_ar toc]
     
-    mem_ar=[mem_ar 8*(Nx*Ny)^2];
+    mem_ar=[mem_ar 8*(Nx*Ny)^2]
     Delta = sqrt(sqrt(8./mem_ar)*Lx*Ly);
 
     
@@ -308,49 +308,40 @@ axis equal
 axis tight
 
 %% Question 2
-figure(4)
-loglog(d_ar,mem_ar/1024^3,':o')
-axis([1e-3 1 1e-4 128])
-axis square
-xlabel('\delta [m]')
-ylabel('mem [Gb]')
-title('Mémoire nécessaire selon le pas')
+% figure(4)
+% loglog(d_ar,mem_ar/1024^3,':o')
+% axis([1e-3 1 1e-4 128])
+% axis square
+% xlabel('\delta [m]')
+% ylabel('mem [Gb]')
 
-figure(5)
-loglog(d_ar,tini_ar,':o')
-axis([1e-3 1 1e-3 10000])
-axis square
-xlabel('\delta [m]')
-ylabel('t_{ini} [s]')
-title('Temps d''initialisation de la matrice selon le pas')
+% figure(5)
+% loglog(d_ar,tini_ar,':o')
+% axis([1e-3 1 1e-3 10000])
+% axis square
+% xlabel('\delta [m]')
+% ylabel('t_{ini} [s]')
 
-figure(6)
-loglog(d_ar,tinv_ar,':o')
-axis([1e-3 1 1e-3 10000])
-axis square
-xlabel('\delta [m]')
-ylabel('t_{inv} [s]')
-title('Temps d''inversion de la matrice selon le pas')
+% figure(6)
+% loglog(d_ar,tinv_ar,':o')
+% axis([1e-3 1 1e-3 10000])
+% axis square
+% xlabel('\delta [m]')
+% ylabel('t_{inv} [s]')
 
 figure(7)
 loglog(d_ar,Tm_ar,':o')
 axis tight
 xlabel('\delta [m]')
 ylabel('Err [^oC]')
-title('Erreur sur la température au milieu selon le pas')
 
 poly_mem = polyfit(log(d_ar),log(mem_ar/1024^3),1);
 poly_ini = polyfit(log(d_ar),log(tini_ar),1);
 poly_inv = polyfit(log(d_ar),log(tinv_ar),1);
 poly_err = polyfit(log(d_ar),log(Tm_ar),1);
 
-fprintf('Les coéfficients pour la mémoire nécessaire sont P_mem = %.2f et A_mem = %.2f \n',poly_mem(1),poly_mem(2))
-fprintf('Les coéfficients pour le temps d''initialisation sont P_ini = %.2f et A_ini = %.2f \n',poly_ini(1),poly_ini(2))
-fprintf('Les coéfficients pour le temps d''inversion sont P_inv = %.2f et A_inv = %.2f \n',poly_inv(1),poly_inv(2))
-fprintf('Les coéfficients pour l''erreur sur la température au milieu sont P_err = %.2f et A_err = %.2f \n',poly_err(1),poly_err(2))
+fprintf('Les coéfficients pour la mémoire sont Am = %.2e et Pm = %.2e \n',poly_mem(1),)
 
-%% Question 3
+%% Pas de disctrétisation minimal
 delta_min =sqrt(sqrt(8/(128e9))*Lx*Ly); 
-
-fprintf('Le pas de discrétisation minimal avec 128 Gb de RAM est delta = %.4f \n',delta_min)
 
