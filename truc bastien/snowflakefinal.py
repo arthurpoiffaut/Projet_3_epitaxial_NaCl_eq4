@@ -13,11 +13,11 @@ maxIt = 250 #maximal iteration of growth steps
 mx = 251 #width 
 my = 251 #and height of the snowflake arrays
 
-rho = 0.7 #water vapor
+rho = 0.5 #water vapor
 gamma = 0.0000005 #constant influence from the third dim. which can be understood 
                 #similar as the vapor,
                 #but from the normal dimension of the snowflake
-alpha = 1.2 #diffusion constant
+alpha = 0.5 #diffusion constant
 
 #implement arrays for the ice mass value, receptive and
 #non-receptive sites and set all elements equal to the inital
