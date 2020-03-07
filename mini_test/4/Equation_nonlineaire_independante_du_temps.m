@@ -107,7 +107,7 @@ while (flag==1)
 end
 hold 
 
-%%
+%% i
 Tmax=max(T);
 figure(2)
 plot(x,T,'b')
@@ -115,3 +115,84 @@ xlabel('T[K]');ylabel('x[m]');title(['q_{max}= ',num2str(q) ' T_{max}= ',num2str
 
 figure(3);semilogy((1:ci),Err,':o');
 xlabel('Étape');ylabel('Err'); title('Convergence de la méthode de Newton')
+
+
+%% ii
+
+Tmm=2000;%T max mur
+q=linspace(10^(6),10^(7),10000000);
+
+
+ci=0;
+Err=[];
+tol=1e-12;
+flag=1;
+
+%% resolutionflag2
+flag2=1;
+i=0;
+while flag2==1;
+   i=i+1;
+    S=q(i)*exp(-((x-L)/dL).^2);
+    while (flag==1)
+        ci=ci+1;
+        
+        M=diag(-2*ones(1,N+1),0)+diag(ones(1,N),-1)+diag(ones(1,N),1);
+        
+        % condition x=0
+        M(1,1)=-3*c1;%2*c2*dx-3*c1;
+        M(1,2)=4*c1;
+        M(1,3)=-c1;
+        % -k*dT/dx=-si*(T^4-To^4)
+        %c1=-k;
+        %c2=0;
+        %c3=-si*To^4;
+        
+        %d1=-k;
+        %d2=0;
+        %d3=si*TL^4;
+        % condition x=L
+        M(N+1,N+1)=-3*d1;%+2*d2*dx;
+        M(N+1,N)=4*d1;
+        M(N+1,N-1)=-d1;
+        
+        % !!! Condition radiative est implementée SEULEMENT sur la face externe du mur !!!
+        b=(S/k)*dx^2;
+        %condition x=0
+        b(1)=-2*h*dx*(To-T(1))+2*dx*(T(1)^4*si+c3);%%-2*dx^2*(To-T(1))+2*dx*(T(1)^4*si+c3);
+        %conditon x=L
+        
+        b(N+1)=-2*h*dx*(To-T(N+1))+2*dx*(T(N+1)^4*si+d3);%-2*dx^2*(To-T(N+1))+2*dx*(T(N+1)^4*si+d3);%=2*dx*(T(N+1)^4*si+d3);%-2*dx^2*(To-T(N+1))+%2*dx*(T(N+1)^4*si+d3);%-2*dx*(T(N+1)^4*si+d3);%2*dx^2*(To-T(N+1))-2*dx*(T(N+1)^4*si+d3);%2*d3*dx;
+        
+        F=M*T+b;
+        Err=[Err sum(abs(F))/(N+1)];
+        %display(['Étape=', num2str(ci), '   ;   Err=' num2str(Err(end))])
+        if (Err(end)<tol)
+            flag=0 ; % metre flag ==0 ? jai la fleme
+        end
+    
+        % % pas sur de l'utiliter
+        
+        % !!! Condition radiative est implementée SEULEMENT sur la face externe du mur !!!
+        J=M;
+        J(1,1)=M(1,1)+T(1)^3*8*dx*si+2*h*dx; %probablement la mon erreure mais je compren pas
+        J(N+1,N+1)=M(N+1,N+1)+T(N+1)^3*8*dx*si+2*h*dx;
+        
+        
+        dT=-J\F;
+        T=T+dT;
+        %figure(1)
+        %plot(x,T,'b')
+        
+    end
+    ci=0;
+    Err=[];
+    flag=1;
+    Tmax=max(T)
+    if Tmm<Tmax; %peut etre trouevr un condition je sai pason trouve proche mais exacte
+        q(i)
+        figure
+        plot(x,T,'b')
+        flag2=0;
+    end
+end
