@@ -95,16 +95,23 @@ while (flag==1)
     
     % !!! Condition radiative est implementée SEULEMENT sur la face externe du mur !!!
     J=M;
-    J(1,1)=M(1,1)+T(1)^3*8*dx*si; %probablement la mon erreure mais je compren pas
-    J(N+1,N+1)=M(N+1,N+1)+T(N+1)^3*8*dx*si;
+    J(1,1)=M(1,1)+T(1)^3*8*dx*si+2*h*dx; %probablement la mon erreure mais je compren pas
+    J(N+1,N+1)=M(N+1,N+1)+T(N+1)^3*8*dx*si+2*h*dx;
     
     
     dT=-J\F;
     T=T+dT;
-    
+    figure(1)
     plot(x,T,'b')
+    
 end
-hold
+hold 
 
-figure(2);semilogy((1:ci),Err,':o');
-xlabel('Étape');ylabel('Err');
+%%
+Tmax=max(T);
+figure(2)
+plot(x,T,'b')
+xlabel('T[K]');ylabel('x[m]');title(['q_{max}= ',num2str(q) ' T_{max}= ',num2str(Tmax),'K']);
+
+figure(3);semilogy((1:ci),Err,':o');
+xlabel('Étape');ylabel('Err'); title('Convergence de la méthode de Newton')
