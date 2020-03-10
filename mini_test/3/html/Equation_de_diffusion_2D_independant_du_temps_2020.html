@@ -1,0 +1,772 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Equation_de_diffusion_2D_independant_du_temps_2020</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-25"><meta name="DC.source" content="Equation_de_diffusion_2D_independant_du_temps_2020.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Initialisation de la source de chaleur et de la conductivit&eacute; thermique</a></li><li><a href="#4">Construction de la matrice des coefficients</a></li><li><a href="#6">Question 1</a></li><li><a href="#7">Question 2</a></li><li><a href="#8">Question 3</a></li></ul></div><pre class="codeinput"><span class="comment">% Distribution de la temp&eacute;rature dans un appartement d'un immeuble aux plusieurs &eacute;tages</span>
+clear <span class="string">all</span>
+clc
+
+<span class="comment">% &Eacute;quation de transfert de chaleur:</span>
+<span class="comment">% k*(d^2 T(x,y)/dx^2 + d^2 T(x,y)/dy^2)+S=0</span>
+
+
+<span class="comment">% Conditions aux limites:</span>
+
+<span class="comment">% (1) Condition convective (de Robin) &agrave; x=0 et &agrave; x=Lx (faces externes du mur):</span>
+<span class="comment">% -k*dT(x=0,y)/dx=-h*(T-Ta)</span>
+<span class="comment">% -k*dT(x=L,y)/dx=h*(T-Ta)</span>
+Ta=-10; <span class="comment">%oC</span>
+
+
+<span class="comment">% Dimensions d'appartement</span>
+Lx=4; <span class="comment">%[m]</span>
+Ly=2.4;  <span class="comment">%[m]</span>
+
+<span class="comment">% Parametres d'un mur d'isolation thermique</span>
+Lm=0.4; <span class="comment">%m ; &Eacute;paisseur du mur en brique</span>
+km=0.85;<span class="comment">%W/(m*K); La conductivit&eacute; thermique de la brique</span>
+h=20; <span class="comment">%W/(m^2*K); Coefficient de transfert thermique sur les surfaces ext&eacute;rieures du mur</span>
+
+<span class="comment">% Param&egrave;tres de l'air qui remplit l'appartement</span>
+ka=0.024;
+
+
+
+
+d_ar=[];tini_ar=[];tinv_ar=[];mem_ar=[];Tm_ar=[];tempMileu=[];
+<span class="keyword">for</span> fact=100e-2 * [1 1/2 1/4]
+</pre><pre class="codeinput">    d=0.1*fact; <span class="comment">%Pas de discr&eacute;tisation en [m]</span>
+    d_ar=[d_ar d];
+    Nx=round(Lx/d)+1;
+    Ny=round(Ly/d)+1;
+    Nm=round(Lm/d)+1;
+
+
+    tic
+</pre><h2 id="3">Initialisation de la source de chaleur et de la conductivit&eacute; thermique</h2><pre class="codeinput">    S=zeros(Ny,Nx); k=zeros(Ny,Nx);
+    <span class="keyword">for</span> i=1:Ny
+        y=(i-1)*d;
+        <span class="keyword">for</span> j=1:Nx
+            x=(j-1)*d;
+
+            <span class="comment">% Sourse volumique de chaleur q[W/m^3] d'&eacute;paisseur dL.</span>
+            <span class="comment">% La source est int&eacute;gr&eacute;e dans les parties int&eacute;rieures du mur &agrave; x=Lm et &agrave; x=Lx-Lm et</span>
+            <span class="comment">% il occupe les tiers du mur dans la direction verticale</span>
+            dL=0.1;
+            q=1e4;<span class="comment">% W/m^3;</span>
+            <span class="keyword">if</span> (x&lt;=Lm)&amp;&amp;(y&lt;=Ly/3+Lm)&amp;&amp;(y&gt;Lm)
+                <span class="comment">% &Agrave; l'int&eacute;rieur de l'&eacute;l&eacute;ment chauffant</span>
+                S(i,j)=q*exp(-((x-Lm)/dL).^2);
+            <span class="keyword">elseif</span> (x&gt;=(Lx-Lm))&amp;&amp;(y&lt;=Ly/3+Lm)&amp;&amp;(y&gt;Lm)
+                <span class="comment">% &Agrave; l'int&eacute;rieur de l'&eacute;l&eacute;ment chauffant</span>
+                S(i,j)=q*exp(-((Lx-Lm-x)/dL).^2);
+            <span class="keyword">else</span>
+                <span class="comment">% &Agrave; l'ext&eacute;rieur de l'&eacute;l&eacute;ment chauffant</span>
+                S(i,j)=0;
+            <span class="keyword">end</span>
+
+            <span class="comment">% L'espace de vie de l'appartement est d&eacute;limit&eacute; par</span>
+            <span class="comment">% les parois d'&eacute;paisseur Lm &agrave; tous les quatre c&ocirc;t&eacute;s</span>
+            <span class="keyword">if</span> (x&lt;=Lm)||(x&gt;=(Lx-Lm))||(y&lt;=Lm)||(y&gt;=(Ly-Lm))
+                <span class="comment">% &Agrave; l'int&eacute;rieur du mur</span>
+                k(i,j)=km;
+            <span class="keyword">else</span>
+                <span class="comment">% &Agrave; l'int&eacute;rieurde de l'appartement</span>
+                k(i,j)=ka;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><h2 id="4">Construction de la matrice des coefficients</h2><pre class="codeinput">    M=sparse(zeros(Nx*Ny,Nx*Ny));
+    b=zeros(Nx*Ny,1);
+
+    <span class="keyword">for</span> i=1:Ny
+        <span class="keyword">for</span> j=1:Nx
+            <span class="comment">% remplir la ligne pl de la matrice M</span>
+            index=(i-1)*Nx+j;
+
+
+            <span class="keyword">if</span> (i==1) &amp; (j~=1)&amp; (j~=Nx)
+                <span class="comment">% noeud sur le plafond y=0</span>
+                pl = index;
+                pc = index;      M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index+1*Nx;   M(pl,pc)=-4;
+                pc=index+2*Nx;    M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = <span class="string">'ext'</span>;
+            <span class="keyword">elseif</span> (i==Ny) &amp; (j~=1)&amp; (j~=Nx)
+                <span class="comment">% noeud sur le plancher y=Ly</span>
+                pl = index;
+                pc = index;       M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index-1*Nx;    M(pl,pc)=-4;
+                pc=index-2*Nx;    M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = <span class="string">'ext'</span>;
+            <span class="keyword">elseif</span> (j==1)&amp; (i~=1)&amp; (i~=Ny)
+                <span class="comment">% noeud &agrave; la surface externe du mur x=0</span>
+                pl = index;
+                pc = index;         M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index+1;    M(pl,pc)=-4;
+                pc=index+2;    M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = <span class="string">'ext'</span>;
+            <span class="keyword">elseif</span> (j==Nx)&amp; (i~=1)&amp; (i~=Ny)
+                <span class="comment">% noeud &agrave; la surface externe du mur x=Nx</span>
+                pl = index;
+                pc = index;M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index-1;M(pl,pc)=-4;
+                pc=index-2;M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = <span class="string">'ext'</span>;
+
+             <span class="comment">% Coins ext&eacute;rieur</span>
+             <span class="keyword">elseif</span> (i==1)&amp;&amp;(j==1)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index+1 + 1*Nx;     M(pl,pc)=-4;
+                pc=index+2 + 2*Nx;     M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+             <span class="keyword">elseif</span> (i==1)&amp;&amp;(j==Nx)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index-1 + 1*Nx;     M(pl,pc)=-4;
+                pc=index-2 + 2*Nx;     M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+             <span class="keyword">elseif</span> (i==Ny)&amp;&amp;(j==1)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index+1 - 1*Nx;     M(pl,pc)=-4;
+                pc=index+2 - 2*Nx;     M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+             <span class="keyword">elseif</span> (i==Ny)&amp;&amp;(j==Nx)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j);
+                pc=index-1 - 1*Nx;     M(pl,pc)=-4;
+                pc=index-2 - 2*Nx;     M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+
+
+            <span class="comment">% Mur int&eacute;rieur</span>
+            <span class="keyword">elseif</span> (i==Nm+1)&amp; (j&gt;Nm+1 &amp; j&lt;Nx-Nm)
+                <span class="comment">% noeud &agrave; la surface interne du mur y=Nm</span>
+                pl = index;
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index+1*Nx; M(pl,pc)=(-4)*ka;
+                pc = index+2*Nx; M(pl,pc)=ka;
+                pc = index-1*Nx;   M(pl,pc)=-(3)*km;
+                pc = index-2*Nx;   M(pl,pc)=-(-4)*km;
+                pc = index-3*Nx;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'int'</span>;
+            <span class="keyword">elseif</span> (i==Ny-Nm)&amp; (j&gt;Nm+1 &amp; j&lt;Nx-Nm)
+                <span class="comment">% noeud &agrave; la surface interne du mur y = Ny-Nm</span>
+                pl = index;
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index-1*Nx; M(pl,pc)=(-4)*ka;
+                pc = index-2*Nx; M(pl,pc)=ka;
+                pc = index+1*Nx;   M(pl,pc)=-(3)*km;
+                pc = index+2*Nx;   M(pl,pc)=-(-4)*km;
+                pc = index+3*Nx;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'int'</span>;
+            <span class="keyword">elseif</span> (j==Nm+1) &amp;(i&gt;Nm+1 &amp; i&lt;Ny-Nm)
+                <span class="comment">% noeud &agrave; la surface interne du mur x=Nm</span>
+                pl = index;
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index+1; M(pl,pc)=(-4)*ka;
+                pc = index+2; M(pl,pc)=ka;
+                pc = index-1;   M(pl,pc)=-(3)*km;
+                pc = index-2;   M(pl,pc)=-(-4)*km;
+                pc = index-3;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'int'</span>;
+            <span class="keyword">elseif</span> (j==Nx-Nm) &amp;(i&gt;Nm+1 &amp; i&lt;Ny-Nm)
+                <span class="comment">% noeud &agrave; la surface interne du mur x=Nx-Nm</span>
+                pl = index;
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index-1; M(pl,pc)=(-4)*ka;
+                pc = index-2; M(pl,pc)=ka;
+                pc = index+1;   M(pl,pc)=-(3)*km;
+                pc = index+2;   M(pl,pc)=-(-4)*km;
+                pc = index+3;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'int'</span>;
+
+
+             <span class="comment">% Coins int&eacute;rieur</span>
+             <span class="keyword">elseif</span> (i==Nm+1)&amp;&amp;(j==Nm+1)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index+1+1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index+2+2*Nx;  M(pl,pc)=ka;
+                pc = index-1-1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index-2-2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index-3-3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'coin'</span>;
+             <span class="keyword">elseif</span> (i==Nm+1)&amp;&amp;(j==Nm+1)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index-1+1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index-2+2*Nx;  M(pl,pc)=ka;
+                pc = index+1-1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index+2-2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index+3-3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'coin'</span>;
+             <span class="keyword">elseif</span> (i==Ny-Nm)&amp;&amp;(j==Nm+1)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index+1-1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index+2-2*Nx;  M(pl,pc)=ka;
+                pc = index-1+1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index-2+2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index-3+3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'coin'</span>;
+             <span class="keyword">elseif</span> (i==Ny-Nm)&amp;&amp;(j==Nx-Nm)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index-1-1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index-2-2*Nx;  M(pl,pc)=ka;
+                pc = index+1+1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index+2+2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index+3+3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = <span class="string">'coin'</span>;
+
+
+
+
+            <span class="keyword">elseif</span> ((i&gt;1)&amp;(i&lt;Ny))&amp;((j&gt;1)&amp;(j&lt;Nx))
+                <span class="comment">% noeud qui est strictement &agrave; l'int&eacute;rieur de la cellule de simulation</span>
+                pl=index;
+                pc=index;M(pl,pc)=-4; <span class="comment">% contribution de noeud (i,j)</span>
+                pc=(i-1)*Nx+j-1;M(pl,pc)=1; <span class="comment">% contribution de noeud (i,j-1)</span>
+                pc=(i-1)*Nx+j+1;M(pl,pc)=1; <span class="comment">% contribution de noeud (i,j+1)</span>
+                pc=(i-2)*Nx+j;M(pl,pc)=1; <span class="comment">% contribution de noeud (i-1,j)</span>
+                pc=(i)*Nx+j;M(pl,pc)=1; <span class="comment">% contribution de noeud (i+1,j)</span>
+                b(pl)=-d^2*S(i,j)/k(i,j);
+                test{i,j} = <span class="string">''</span>;
+
+
+
+
+            <span class="keyword">else</span>
+                display(<span class="string">'Erreur dans la d&eacute;finition de la matrice de coefficients'</span>);
+                disp(i)
+                disp(j)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    M = sparse(M);
+    <span class="keyword">end</span>
+    tini_ar=[tini_ar toc];
+
+    tic
+    <span class="comment">%T=M\b;</span>
+    [L,U]=lu(M);T=U\(L\b);
+
+    tinv_ar=[tinv_ar toc];
+
+    mem_ar=[mem_ar 8*(Nx*Ny)^2];
+    Delta = sqrt(sqrt(8./mem_ar)*Lx*Ly);
+
+
+    Tr=reshape(T,Nx,Ny)';
+    Tm_ar=[Tm_ar Tr(round(Ly/d/2+1),round(Lx/d/2+1))];
+    ErrTemp=abs(Tm_ar(1:end-1)-Tm_ar(2:1:end));
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><h2 id="6">Question 1</h2><pre class="codeinput">fprintf(<span class="string">'La temp&eacute;rature au milieu est %.0f C \n'</span>,Tm_ar(end))
+fprintf(<span class="string">'L''erreur sur la temp&eacute;rature est de %.0f C \n'</span>,ErrTemp(end))
+
+<span class="comment">% figure(1)</span>
+<span class="comment">% h=pcolor((0:d:Lx),(0:d:Ly),S);set(h,'LineStyle','none')</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% xlabel('x [m]'); ylabel('y [m]'); title('S(x,y) [W/m^3]')</span>
+<span class="comment">% axis equal</span>
+<span class="comment">% axis tight</span>
+
+<span class="comment">% figure(2)</span>
+<span class="comment">% h=pcolor((0:d:Lx),(0:d:Ly),k);set(h,'LineStyle','none')</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% xlabel('x [m]'); ylabel('y [m]'); title('k(x,y) [W/(m^2\cdotK)]')</span>
+<span class="comment">% axis equal</span>
+<span class="comment">% axis tight</span>
+
+figure(3)
+h=pcolor((0:d:Lx),(0:d:Ly),Tr);set(h,<span class="string">'LineStyle'</span>,<span class="string">'none'</span>)
+colorbar
+<span class="comment">% caxis([-20 20])</span>
+xlabel(<span class="string">'x [m]'</span>); ylabel(<span class="string">'y [m]'</span>); title(<span class="string">'T(x,y) [^oC]'</span>)
+axis <span class="string">equal</span>
+axis <span class="string">tight</span>
+</pre><pre class="codeoutput">La temp&eacute;rature au milieu est 8 C 
+L'erreur sur la temp&eacute;rature est de 3 C 
+</pre><img vspace="5" hspace="5" src="Equation_de_diffusion_2D_independant_du_temps_2020_01.png" alt=""> <h2 id="7">Question 2</h2><pre class="codeinput">figure(4)
+loglog(d_ar,mem_ar/1024^3,<span class="string">':o'</span>)
+axis([1e-3 1 1e-4 128])
+axis <span class="string">square</span>
+xlabel(<span class="string">'\delta [m]'</span>)
+ylabel(<span class="string">'mem [Gb]'</span>)
+title(<span class="string">'M&eacute;moire n&eacute;cessaire selon le pas'</span>)
+
+figure(5)
+loglog(d_ar,tini_ar,<span class="string">':o'</span>)
+axis([1e-3 1 1e-3 10000])
+axis <span class="string">square</span>
+xlabel(<span class="string">'\delta [m]'</span>)
+ylabel(<span class="string">'t_{ini} [s]'</span>)
+title(<span class="string">'Temps d''initialisation de la matrice selon le pas'</span>)
+
+figure(6)
+loglog(d_ar,tinv_ar,<span class="string">':o'</span>)
+axis([1e-3 1 1e-3 10000])
+axis <span class="string">square</span>
+xlabel(<span class="string">'\delta [m]'</span>)
+ylabel(<span class="string">'t_{inv} [s]'</span>)
+title(<span class="string">'Temps d''inversion de la matrice selon le pas'</span>)
+
+figure(7)
+loglog(d_ar,Tm_ar,<span class="string">':o'</span>)
+axis <span class="string">tight</span>
+xlabel(<span class="string">'\delta [m]'</span>)
+ylabel(<span class="string">'Err [^oC]'</span>)
+title(<span class="string">'Erreur sur la temp&eacute;rature au milieu selon le pas'</span>)
+
+poly_mem = polyfit(log(d_ar),log(mem_ar/1024^3),1);
+poly_ini = polyfit(log(d_ar),log(tini_ar),1);
+poly_inv = polyfit(log(d_ar),log(tinv_ar),1);
+poly_err = polyfit(log(d_ar),log(Tm_ar),1);
+
+fprintf(<span class="string">'Les co&eacute;fficients pour la m&eacute;moire n&eacute;cessaire sont P_mem = %.2f et A_mem = %.2f \n'</span>,poly_mem(1),poly_mem(2))
+fprintf(<span class="string">'Les co&eacute;fficients pour le temps d''initialisation sont P_ini = %.2f et A_ini = %.2f \n'</span>,poly_ini(1),poly_ini(2))
+fprintf(<span class="string">'Les co&eacute;fficients pour le temps d''inversion sont P_inv = %.2f et A_inv = %.2f \n'</span>,poly_inv(1),poly_inv(2))
+fprintf(<span class="string">'Les co&eacute;fficients pour l''erreur sur la temp&eacute;rature au milieu sont P_err = %.2f et A_err = %.2f \n'</span>,poly_err(1),poly_err(2))
+</pre><pre class="codeoutput">Warning: Negative data ignored 
+Les co&eacute;fficients pour la m&eacute;moire n&eacute;cessaire sont P_mem = -3.93 et A_mem = -13.90 
+Les co&eacute;fficients pour le temps d'initialisation sont P_ini = -1.75 et A_ini = -5.97 
+Les co&eacute;fficients pour le temps d'inversion sont P_inv = -3.50 et A_inv = -12.94 
+Les co&eacute;fficients pour l'erreur sur la temp&eacute;rature au milieu sont P_err = -0.35 et A_err = 0.71 
+</pre><img vspace="5" hspace="5" src="Equation_de_diffusion_2D_independant_du_temps_2020_02.png" alt=""> <img vspace="5" hspace="5" src="Equation_de_diffusion_2D_independant_du_temps_2020_03.png" alt=""> <img vspace="5" hspace="5" src="Equation_de_diffusion_2D_independant_du_temps_2020_04.png" alt=""> <img vspace="5" hspace="5" src="Equation_de_diffusion_2D_independant_du_temps_2020_05.png" alt=""> <h2 id="8">Question 3</h2><pre class="codeinput">delta_min =sqrt(sqrt(8/(128e9))*Lx*Ly);
+
+fprintf(<span class="string">'Le pas de discr&eacute;tisation minimal avec 128 Gb de RAM est delta = %.4f \n'</span>,delta_min)
+</pre><pre class="codeoutput">Le pas de discr&eacute;tisation minimal avec 128 Gb de RAM est delta = 0.0087 
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% Distribution de la température dans un appartement d'un immeuble aux plusieurs étages
+clear all
+clc
+
+% Équation de transfert de chaleur:
+% k*(d^2 T(x,y)/dx^2 + d^2 T(x,y)/dy^2)+S=0
+ 
+
+% Conditions aux limites:
+
+% (1) Condition convective (de Robin) à x=0 et à x=Lx (faces externes du mur):
+% -k*dT(x=0,y)/dx=-h*(T-Ta)
+% -k*dT(x=L,y)/dx=h*(T-Ta)
+Ta=-10; %oC
+
+
+% Dimensions d'appartement
+Lx=4; %[m]
+Ly=2.4;  %[m]
+
+% Parametres d'un mur d'isolation thermique
+Lm=0.4; %m ; Épaisseur du mur en brique
+km=0.85;%W/(m*K); La conductivité thermique de la brique
+h=20; %W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieures du mur
+
+% Paramètres de l'air qui remplit l'appartement
+ka=0.024;
+
+
+
+
+d_ar=[];tini_ar=[];tinv_ar=[];mem_ar=[];Tm_ar=[];tempMileu=[];
+for fact=100e-2 * [1 1/2 1/4]
+    d=0.1*fact; %Pas de discrétisation en [m]
+    d_ar=[d_ar d];
+    Nx=round(Lx/d)+1;
+    Ny=round(Ly/d)+1;
+    Nm=round(Lm/d)+1;
+
+    
+    tic
+    %% Initialisation de la source de chaleur et de la conductivité thermique
+    S=zeros(Ny,Nx); k=zeros(Ny,Nx);
+    for i=1:Ny
+        y=(i-1)*d;
+        for j=1:Nx
+            x=(j-1)*d;
+            
+            % Sourse volumique de chaleur q[W/m^3] d'épaisseur dL.
+            % La source est intégrée dans les parties intérieures du mur à x=Lm et à x=Lx-Lm et
+            % il occupe les tiers du mur dans la direction verticale
+            dL=0.1;
+            q=1e4;% W/m^3;
+            if (x<=Lm)&&(y<=Ly/3+Lm)&&(y>Lm)
+                % À l'intérieur de l'élément chauffant
+                S(i,j)=q*exp(-((x-Lm)/dL).^2);
+            elseif (x>=(Lx-Lm))&&(y<=Ly/3+Lm)&&(y>Lm)
+                % À l'intérieur de l'élément chauffant
+                S(i,j)=q*exp(-((Lx-Lm-x)/dL).^2);
+            else
+                % À l'extérieur de l'élément chauffant
+                S(i,j)=0;
+            end
+            
+            % L'espace de vie de l'appartement est délimité par
+            % les parois d'épaisseur Lm à tous les quatre côtés
+            if (x<=Lm)||(x>=(Lx-Lm))||(y<=Lm)||(y>=(Ly-Lm))
+                % À l'intérieur du mur
+                k(i,j)=km;
+            else
+                % À l'intérieurde de l'appartement
+                k(i,j)=ka;
+            end
+        end
+    end
+    
+    %% Construction de la matrice des coefficients
+    M=sparse(zeros(Nx*Ny,Nx*Ny));
+    b=zeros(Nx*Ny,1);
+    
+    for i=1:Ny
+        for j=1:Nx
+            % remplir la ligne pl de la matrice M
+            index=(i-1)*Nx+j;
+            
+  
+            if (i==1) & (j~=1)& (j~=Nx)
+                % noeud sur le plafond y=0
+                pl = index;
+                pc = index;      M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1*Nx;   M(pl,pc)=-4;
+                pc=index+2*Nx;    M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = 'ext';
+            elseif (i==Ny) & (j~=1)& (j~=Nx)
+                % noeud sur le plancher y=Ly
+                pl = index; 
+                pc = index;       M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1*Nx;    M(pl,pc)=-4; 
+                pc=index-2*Nx;    M(pl,pc)=1; 
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = 'ext';
+            elseif (j==1)& (i~=1)& (i~=Ny)
+                % noeud à la surface externe du mur x=0
+                pl = index; 
+                pc = index;         M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1;    M(pl,pc)=-4; 
+                pc=index+2;    M(pl,pc)=1; 
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = 'ext';                
+            elseif (j==Nx)& (i~=1)& (i~=Ny)
+                % noeud à la surface externe du mur x=Nx
+                pl = index; 
+                pc = index;M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1;M(pl,pc)=-4; 
+                pc=index-2;M(pl,pc)=1; 
+                b(index)=2*d*h*Ta/k(i,j);
+                test{i,j} = 'ext';
+               
+             % Coins extérieur
+             elseif (i==1)&&(j==1)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1 + 1*Nx;     M(pl,pc)=-4; 
+                pc=index+2 + 2*Nx;     M(pl,pc)=1; 
+                b(index)=2*d*h*Ta/k(i,j);    
+             elseif (i==1)&&(j==Nx)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1 + 1*Nx;     M(pl,pc)=-4; 
+                pc=index-2 + 2*Nx;     M(pl,pc)=1; 
+                b(index)=2*d*h*Ta/k(i,j); 
+             elseif (i==Ny)&&(j==1)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1 - 1*Nx;     M(pl,pc)=-4; 
+                pc=index+2 - 2*Nx;     M(pl,pc)=1; 
+                b(index)=2*d*h*Ta/k(i,j); 
+             elseif (i==Ny)&&(j==Nx)
+                pl = index;
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1 - 1*Nx;     M(pl,pc)=-4; 
+                pc=index-2 - 2*Nx;     M(pl,pc)=1;
+                b(index)=2*d*h*Ta/k(i,j); 
+
+
+            % Mur intérieur 
+            elseif (i==Nm+1)& (j>Nm+1 & j<Nx-Nm)
+                % noeud à la surface interne du mur y=Nm
+                pl = index; 
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index+1*Nx; M(pl,pc)=(-4)*ka;
+                pc = index+2*Nx; M(pl,pc)=ka;
+                pc = index-1*Nx;   M(pl,pc)=-(3)*km;
+                pc = index-2*Nx;   M(pl,pc)=-(-4)*km;
+                pc = index-3*Nx;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'int';
+            elseif (i==Ny-Nm)& (j>Nm+1 & j<Nx-Nm)
+                % noeud à la surface interne du mur y = Ny-Nm
+                pl = index; 
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index-1*Nx; M(pl,pc)=(-4)*ka;
+                pc = index-2*Nx; M(pl,pc)=ka;
+                pc = index+1*Nx;   M(pl,pc)=-(3)*km;
+                pc = index+2*Nx;   M(pl,pc)=-(-4)*km;
+                pc = index+3*Nx;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'int';
+            elseif (j==Nm+1) &(i>Nm+1 & i<Ny-Nm)
+                % noeud à la surface interne du mur x=Nm
+                pl = index; 
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index+1; M(pl,pc)=(-4)*ka;
+                pc = index+2; M(pl,pc)=ka;
+                pc = index-1;   M(pl,pc)=-(3)*km;
+                pc = index-2;   M(pl,pc)=-(-4)*km;
+                pc = index-3;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'int';
+            elseif (j==Nx-Nm) &(i>Nm+1 & i<Ny-Nm)
+                % noeud à la surface interne du mur x=Nx-Nm
+                pl = index; 
+                pc = index;   M(pl,pc)=(3)*ka;
+                pc = index-1; M(pl,pc)=(-4)*ka;
+                pc = index-2; M(pl,pc)=ka;
+                pc = index+1;   M(pl,pc)=-(3)*km;
+                pc = index+2;   M(pl,pc)=-(-4)*km;
+                pc = index+3;   M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'int';
+                
+ 
+             % Coins intérieur
+             elseif (i==Nm+1)&&(j==Nm+1)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index+1+1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index+2+2*Nx;  M(pl,pc)=ka;
+                pc = index-1-1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index-2-2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index-3-3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'coin';
+             elseif (i==Nm+1)&&(j==Nm+1)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index-1+1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index-2+2*Nx;  M(pl,pc)=ka;
+                pc = index+1-1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index+2-2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index+3-3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'coin';
+             elseif (i==Ny-Nm)&&(j==Nm+1)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index+1-1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index+2-2*Nx;  M(pl,pc)=ka;
+                pc = index-1+1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index-2+2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index-3+3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'coin';
+             elseif (i==Ny-Nm)&&(j==Nx-Nm)
+                pl = index;
+                pc = index;         M(pl,pc)=(3)*ka;
+                pc = index-1-1*Nx;  M(pl,pc)=(-4)*ka;
+                pc = index-2-2*Nx;  M(pl,pc)=ka;
+                pc = index+1+1*Nx;  M(pl,pc)=-(3)*km;
+                pc = index+2+2*Nx;  M(pl,pc)=-(-4)*km;
+                pc = index+3+3*Nx;  M(pl,pc)=-km;
+                b(index)=0;
+                test{i,j} = 'coin';              
+                
+                
+                
+                
+            elseif ((i>1)&(i<Ny))&((j>1)&(j<Nx)) 
+                % noeud qui est strictement à l'intérieur de la cellule de simulation
+                pl=index;
+                pc=index;M(pl,pc)=-4; % contribution de noeud (i,j)
+                pc=(i-1)*Nx+j-1;M(pl,pc)=1; % contribution de noeud (i,j-1)
+                pc=(i-1)*Nx+j+1;M(pl,pc)=1; % contribution de noeud (i,j+1)
+                pc=(i-2)*Nx+j;M(pl,pc)=1; % contribution de noeud (i-1,j)
+                pc=(i)*Nx+j;M(pl,pc)=1; % contribution de noeud (i+1,j)
+                b(pl)=-d^2*S(i,j)/k(i,j);
+                test{i,j} = '';
+
+                
+                
+                
+            else
+                display('Erreur dans la définition de la matrice de coefficients');
+                disp(i)
+                disp(j)
+            end
+        end
+    M = sparse(M);
+    end
+    tini_ar=[tini_ar toc];
+    
+    tic
+    %T=M\b;
+    [L,U]=lu(M);T=U\(L\b);
+
+    tinv_ar=[tinv_ar toc];
+    
+    mem_ar=[mem_ar 8*(Nx*Ny)^2];
+    Delta = sqrt(sqrt(8./mem_ar)*Lx*Ly);
+
+    
+    Tr=reshape(T,Nx,Ny)';  
+    Tm_ar=[Tm_ar Tr(round(Ly/d/2+1),round(Lx/d/2+1))];
+    ErrTemp=abs(Tm_ar(1:end-1)-Tm_ar(2:1:end));
+    
+end
+
+%% Question 1
+fprintf('La température au milieu est %.0f C \n',Tm_ar(end))
+fprintf('L''erreur sur la température est de %.0f C \n',ErrTemp(end))
+
+% figure(1)
+% h=pcolor((0:d:Lx),(0:d:Ly),S);set(h,'LineStyle','none')
+% colorbar
+% xlabel('x [m]'); ylabel('y [m]'); title('S(x,y) [W/m^3]')
+% axis equal
+% axis tight
+
+% figure(2)
+% h=pcolor((0:d:Lx),(0:d:Ly),k);set(h,'LineStyle','none')
+% colorbar
+% xlabel('x [m]'); ylabel('y [m]'); title('k(x,y) [W/(m^2\cdotK)]')
+% axis equal
+% axis tight
+
+figure(3)
+h=pcolor((0:d:Lx),(0:d:Ly),Tr);set(h,'LineStyle','none')
+colorbar
+% caxis([-20 20])
+xlabel('x [m]'); ylabel('y [m]'); title('T(x,y) [^oC]')
+axis equal
+axis tight
+
+%% Question 2
+figure(4)
+loglog(d_ar,mem_ar/1024^3,':o')
+axis([1e-3 1 1e-4 128])
+axis square
+xlabel('\delta [m]')
+ylabel('mem [Gb]')
+title('Mémoire nécessaire selon le pas')
+
+figure(5)
+loglog(d_ar,tini_ar,':o')
+axis([1e-3 1 1e-3 10000])
+axis square
+xlabel('\delta [m]')
+ylabel('t_{ini} [s]')
+title('Temps d''initialisation de la matrice selon le pas')
+
+figure(6)
+loglog(d_ar,tinv_ar,':o')
+axis([1e-3 1 1e-3 10000])
+axis square
+xlabel('\delta [m]')
+ylabel('t_{inv} [s]')
+title('Temps d''inversion de la matrice selon le pas')
+
+figure(7)
+loglog(d_ar,Tm_ar,':o')
+axis tight
+xlabel('\delta [m]')
+ylabel('Err [^oC]')
+title('Erreur sur la température au milieu selon le pas')
+
+poly_mem = polyfit(log(d_ar),log(mem_ar/1024^3),1);
+poly_ini = polyfit(log(d_ar),log(tini_ar),1);
+poly_inv = polyfit(log(d_ar),log(tinv_ar),1);
+poly_err = polyfit(log(d_ar),log(Tm_ar),1);
+
+fprintf('Les coéfficients pour la mémoire nécessaire sont P_mem = %.2f et A_mem = %.2f \n',poly_mem(1),poly_mem(2))
+fprintf('Les coéfficients pour le temps d''initialisation sont P_ini = %.2f et A_ini = %.2f \n',poly_ini(1),poly_ini(2))
+fprintf('Les coéfficients pour le temps d''inversion sont P_inv = %.2f et A_inv = %.2f \n',poly_inv(1),poly_inv(2))
+fprintf('Les coéfficients pour l''erreur sur la température au milieu sont P_err = %.2f et A_err = %.2f \n',poly_err(1),poly_err(2))
+
+%% Question 3
+delta_min =sqrt(sqrt(8/(128e9))*Lx*Ly); 
+
+fprintf('Le pas de discrétisation minimal avec 128 Gb de RAM est delta = %.4f \n',delta_min)
+
+
+##### SOURCE END #####
+--></body></html>
