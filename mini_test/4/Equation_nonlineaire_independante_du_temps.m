@@ -70,7 +70,7 @@ while (flag==1)
     
     %d1=-k;
     %d2=0;
-    %d3=si*TL^4;
+    %d3=-si*TL^4;
     % condition x=L
     M(N+1,N+1)=-3*d1;%+2*d2*dx;
     M(N+1,N)=4*d1;
@@ -120,7 +120,7 @@ xlabel('Étape');ylabel('Err'); title('Convergence de la méthode de Newton')
 %% ii
 
 Tmm=2000;%T max mur
-q=linspace(10^(6),10^(7),10000000);
+q=10^(6),10^(7),10000000);
 
 
 ci=0;
