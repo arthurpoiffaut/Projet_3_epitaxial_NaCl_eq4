@@ -11,11 +11,8 @@ clc
 % (1) Condition convective (de Robin) à x=0 et à x=Lx (faces externes du mur):
 % -k*dT(x=0,y)/dx=-h*(T-Ta)
 % -k*dT(x=L,y)/dx=h*(T-Ta)
-Ta=-20; %oC
+Ta=-10; %oC
 
-% (2) Condition de Dirichlet sur le plafond et sur le plancher
-% T(x, y=0 ou y=Ly)=Tp
-Tp=20; %oC
 
 % Dimensions d'appartement
 Lx=4; %[m]
@@ -24,7 +21,7 @@ Ly=2.4;  %[m]
 % Parametres d'un mur d'isolation thermique
 Lm=0.4; %m ; Épaisseur du mur en brique
 km=0.85;%W/(m*K); La conductivité thermique de la brique
-h=1; %W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieures du mur
+h=20; %W/(m^2*K); Coefficient de transfert thermique sur les surfaces extérieures du mur
 
 % Paramètres de l'air qui remplit l'appartement
 ka=0.024;
@@ -33,7 +30,8 @@ ka=0.024;
 
 
 d_ar=[];tini_ar=[];tinv_ar=[];mem_ar=[];Tm_ar=[];tempMileu=[];
-for fact=10e-2 * [10 5 2.5]
+
+for fact=100e-2 * [1 1/2 1/4] % On veut : fact=10e-2 * [1 1/2 1/4], mais le code plante
     d=0.1*fact; %Pas de discrétisation en [m]
     d_ar=[d_ar d];
     Nx=round(Lx/d)+1;
@@ -53,7 +51,7 @@ for fact=10e-2 * [10 5 2.5]
             % La source est intégrée dans les parties intérieures du mur à x=Lm et à x=Lx-Lm et
             % il occupe les tiers du mur dans la direction verticale
             dL=0.1;
-            q=1e3;% W/m^3;
+            q=1e4;% W/m^3;
             if (x<=Lm)&&(y<=Ly/3+Lm)&&(y>Lm)
                 % À l'intérieur de l'élément chauffant
                 S(i,j)=q*exp(-((x-Lm)/dL).^2);
@@ -78,7 +76,7 @@ for fact=10e-2 * [10 5 2.5]
     end
     
     %% Construction de la matrice des coefficients
-    M=zeros(Nx*Ny,Nx*Ny);
+    M=sparse(zeros(Nx*Ny,Nx*Ny));
     b=zeros(Nx*Ny,1);
     
     for i=1:Ny
@@ -86,66 +84,64 @@ for fact=10e-2 * [10 5 2.5]
             % remplir la ligne pl de la matrice M
             index=(i-1)*Nx+j;
             
-
-
-                
+  
             if (i==1) & (j~=1)& (j~=Nx)
                 % noeud sur le plafond y=0
                 pl = index;
-                pc = index;      M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (1,j)
-                pc=index+1*Nx;   M(pl,pc)=-4; % contribution de noeud (2,j)
-                pc=index+2*Nx;    M(pl,pc)=1; % contribution de noeud (3,j)
+                pc = index;      M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1*Nx;   M(pl,pc)=-4;
+                pc=index+2*Nx;    M(pl,pc)=1;
                 b(index)=2*d*h*Ta/k(i,j);
                 test{i,j} = 'ext';
             elseif (i==Ny) & (j~=1)& (j~=Nx)
                 % noeud sur le plancher y=Ly
                 pl = index; 
-                pc = index;       M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (Nx,j)
-                pc=index-1*Nx;    M(pl,pc)=-4; % contribution de noeud (Nx-1,j)
-                pc=index-2*Nx;    M(pl,pc)=1; % contribution de noeud (Nx-2,j)
+                pc = index;       M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1*Nx;    M(pl,pc)=-4; 
+                pc=index-2*Nx;    M(pl,pc)=1; 
                 b(index)=2*d*h*Ta/k(i,j);
                 test{i,j} = 'ext';
             elseif (j==1)& (i~=1)& (i~=Ny)
                 % noeud à la surface externe du mur x=0
                 pl = index; 
-                pc = index;         M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (i,1)
-                pc=index+1;    M(pl,pc)=-4; % contribution de noeud (i,2)
-                pc=index+2;    M(pl,pc)=1; % contribution de noeud (i,3)
+                pc = index;         M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1;    M(pl,pc)=-4; 
+                pc=index+2;    M(pl,pc)=1; 
                 b(index)=2*d*h*Ta/k(i,j);
                 test{i,j} = 'ext';                
             elseif (j==Nx)& (i~=1)& (i~=Ny)
                 % noeud à la surface externe du mur x=Nx
                 pl = index; 
-                pc = index;M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (i,Nx)
-                pc=index-1;M(pl,pc)=-4; % contribution de noeud (i,Nx-1)
-                pc=index-2;M(pl,pc)=1; % contribution de noeud (i,Nx-2)
+                pc = index;M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1;M(pl,pc)=-4; 
+                pc=index-2;M(pl,pc)=1; 
                 b(index)=2*d*h*Ta/k(i,j);
                 test{i,j} = 'ext';
                
              % Coins extérieur
              elseif (i==1)&&(j==1)
                 pl = index;
-                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (1,j)
-                pc=index+1 + 1*Nx;     M(pl,pc)=-4; % contribution de noeud (2,j)
-                pc=index+2 + 2*Nx;     M(pl,pc)=1; % contribution de noeud (3,j)
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1 + 1*Nx;     M(pl,pc)=-4; 
+                pc=index+2 + 2*Nx;     M(pl,pc)=1; 
                 b(index)=2*d*h*Ta/k(i,j);    
              elseif (i==1)&&(j==Nx)
                 pl = index;
-                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (1,j)
-                pc=index-1 + 1*Nx;     M(pl,pc)=-4; % contribution de noeud (2,j)
-                pc=index-2 + 2*Nx;     M(pl,pc)=1; % contribution de noeud (3,j)
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1 + 1*Nx;     M(pl,pc)=-4; 
+                pc=index-2 + 2*Nx;     M(pl,pc)=1; 
                 b(index)=2*d*h*Ta/k(i,j); 
              elseif (i==Ny)&&(j==1)
                 pl = index;
-                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (1,j)
-                pc=index+1 - 1*Nx;     M(pl,pc)=-4; % contribution de noeud (2,j)
-                pc=index+2 - 2*Nx;     M(pl,pc)=1; % contribution de noeud (3,j)
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index+1 - 1*Nx;     M(pl,pc)=-4; 
+                pc=index+2 - 2*Nx;     M(pl,pc)=1; 
                 b(index)=2*d*h*Ta/k(i,j); 
              elseif (i==Ny)&&(j==Nx)
                 pl = index;
-                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); % contribution de noeud (1,j)
-                pc=index-1 - 1*Nx;     M(pl,pc)=-4; % contribution de noeud (2,j)
-                pc=index-2 - 2*Nx;     M(pl,pc)=1; % contribution de noeud (3,j)
+                pc = index;    M(pl,pc)=3+2*d*h/k(i,j); 
+                pc=index-1 - 1*Nx;     M(pl,pc)=-4; 
+                pc=index-2 - 2*Nx;     M(pl,pc)=1;
                 b(index)=2*d*h*Ta/k(i,j); 
 
 
@@ -282,8 +278,8 @@ for fact=10e-2 * [10 5 2.5]
 end
 
 %% Question 1
-fprintf('La température au milieu est %.2f C \n',Tm_ar(end))
-fprintf('L''erreur sur la température est de %.2f C \n',ErrTemp(end))
+fprintf('La température au milieu est %.0f C \n',Tm_ar(end))
+fprintf('L''erreur sur la température est de %.0f C \n',ErrTemp(end))
 
 % figure(1)
 % h=pcolor((0:d:Lx),(0:d:Ly),S);set(h,'LineStyle','none')
