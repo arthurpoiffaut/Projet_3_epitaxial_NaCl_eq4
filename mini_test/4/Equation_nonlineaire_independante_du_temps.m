@@ -29,7 +29,7 @@ T=To*ones(size(x)); % Approximation initiale
 % Sourse volumique de chaleur q[W/m^3] d'épaisseur dL
 % La source est intégrée dans la partie intérieure du mur
 dL=0.05;
-q=10^6;% W/m^3;
+q=5*10^5;% W/m^3;
 S=q*exp(-((x-L)/dL).^2);
 
 % figure(1);plot(x,T,'r');
@@ -73,7 +73,7 @@ while (flag==1)
     
     F=M*T+b;
     Err=[Err sum(abs(F))/(N+1)];
-    display(['Étape=', num2str(ci), '   ;   Err=' num2str(Err(end))])
+%     display(['Étape=', num2str(ci), '   ;   Err=' num2str(Err(end))])
     if (Err(end)<tol) 
         break ; % metre flag ==0 ? jai la fleme
     end
@@ -106,8 +106,8 @@ xlabel('Étape');ylabel('Err'); title('Convergence de la méthode de Newton')
 
 %% parametrres ii
 
-Tmm=2000;%T max mur
-q=[10^(5),10^(7)]
+Tmm=2250;%T max mur
+q=[10^(5),10^(7)];
 
 
 ci=0;
@@ -120,9 +120,9 @@ flag2=1;
 i=1;
 clc
 q=[10^(5),10^(7)];
-[approx , err_abs] = bissec('tempFunction',q(1),q(2),45,tol)
-[Tmax,Err,ci] = findTmax(approx(end))
-q = approx(end)
+[approx , err_abs] = bissec('tempFunction',q(1),q(2),45,tol);
+[Tmax,Err,ci,T] = findTmax(approx(end));
+q = approx(end);
 
 figure(4);semilogy(err_abs./approx)
 xlabel('Étape');ylabel('Err'); title('Convergence de la méthode de Bissection')

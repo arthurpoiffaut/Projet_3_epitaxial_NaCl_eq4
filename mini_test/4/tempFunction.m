@@ -1,5 +1,5 @@
 function output = tempFunction(q)
-    Tmm = 2000;
-    [Tmax,Err,ci] = findTmax(q)
+    Tmm=2250;
+    [Tmax,Err,ci,T] = findTmax(q);
     output = Tmax - Tmm;
 end

@@ -1,4 +1,4 @@
-function [Tmax,Err,ci] = findTmax(q)
+function [Tmax,Err,ci,T] = findTmax(q)
 L=0.3; %m ; Épaisseur du mur
 k=0.85;%W/(m*K); La conductivité thermique de la brique
 si=5.67e-8; %constante de Stefan-Boltzmann
@@ -70,5 +70,5 @@ while (flag==1)
 end
 
 Tmax=max(T);
-fprintf('%d \n',Tmax)
+% fprintf('%d \n',Tmax)
 
