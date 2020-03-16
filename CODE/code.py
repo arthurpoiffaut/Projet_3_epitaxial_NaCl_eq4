@@ -7,10 +7,7 @@ Created on Tue Mar 10 12:04:51 2020
 
 import numpy as np
 
-#init des vecteur pour regarder les plus proche voisin
-dx = [-1,0,-1,1,0,1,0,0]
-dy = [-1,-1,0,0,1,1,0,0]
-dz = [0,0,0,0,0,0,1,-1]
+
 #FONCTION
 ###############################################################################
 
@@ -58,32 +55,10 @@ def frontiere(ice,dx,dy,dz):
             else:
                 fronpos.append(pos)
             
-            #if in_crystal(pos[0],pos[1],pos[2],ice) :
-                #rien
-              #  pass
-            #if np.shape(fronpos)[0]==1 or np.shape(fronpos)[0]==0 or np.shape(fronpos)[0]==2:
-             #    fronpos.append(pos)  
-            #elif np.shape(fronpos)[0]>1:
-            #    if sum((np.sum(fronpos==pos,axis=0))==4)==1:
-             #       print(sum((np.sum(fronpos==pos,axis=0))==4))
-              #      pass
-               # else:
-                   
-            #else:
-              #  fronpos.append(pos)          #fauderai en enlever les doublon et les element qui son dans le cristall           
-    #fronpos=np.delete(fronpos,0,axis=0)
-    
-    fronpos_clean= [] 
-    for c in range(0,np.shape(fronpos)[0]):
-        e=True
-        for d in range(0,np.shape(fronpos)[0]):
-            if np.array_equal(fronpos[c],fronpos[d]): 
-                pass
-            elif e:
-                fronpos_clean.append(fronpos[c]) 
-                e=False
-    
-    return fronpos_clean
+    return fronpos
+
+
+
 #np.append(fronpos,icepos[a]+np.array([dx[b],dy[b],dz[b]]))
 
 # fonction in frontiere
@@ -107,11 +82,23 @@ def infron(i,j,k,fronpos):
 dimx=16; #dimention x  ect
 dimy=16;
 dimz=16;
+
+#init des vecteur pour regarder les plus proche voisin
+dx = [-1,0,-1,1,0,1,0,0]
+dy = [-1,-1,0,0,1,1,0,0]
+dz = [0,0,0,0,0,0,1,-1]
+
+
+#val
 deltadim=1; # valeur de la dimention 1 micron
 deltat=1; # valeur de la variation de temps
 D=10**-5; #valeur du coe de diff   m^2/sece
 Vcell=np.sqrt(3/2)*(deltadim**3);
 nu_kin=133; # micro metre/sec
+
+
+
+
 #voir poure les autre truc 
 
 
