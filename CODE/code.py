@@ -35,14 +35,18 @@ def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
                          #print(in_crystal(a+dx[d],b+dy[d],c+dz[d],ice,dimx,dimy,dimz))
                          if in_crystal(a+dx[d],b+dy[d],c+dz[d],ice,dimx,dimy,dimz) == False:
                              sum1=(sum1+vap[a,b,c])
+                         elif  (inbox(a+dx[d],b+dy[d],c+dz[d],dimx,dimy,dimz))==False:
+                              sum1=(sum1+vap[a,b,c])
                          else:
                              sum1=(sum1+vap[a+dx[d],b+dy[d],c+dz[d]])
                      for e in range(6,8):
-                        print(c+dz[e])#(in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz))
+                        #print(c+dz[e])#(in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz))
                         if  in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz):
                             #print(vap[a+dx[e],b+dy[e],c+dz[e]])
                             #pas bon doit etre la condition haaaaaaaaaaaa
                             sum2=sum2+vap[a,b,c]   
+                        elif  (inbox(a+dx[e],b+dy[e],c+dz[e],dimx,dimy,dimz))==False:
+                            sum2=sum2+vap[a,b,c]
                         else: 
                             sum2=sum2+vap[a+dx[e],b+dy[e],c+dz[e]]
                             
@@ -121,9 +125,9 @@ def infron(i,j,k,fronpos):
 
 
 #init variable 
-dimx=255; #dimention x  ect
-dimy=255;
-dimz=10;
+dimx=10; #dimention x  ect
+dimy=100;
+dimz=100;
 
 #init des vecteur pour regarder les plus proche voisin
 dx = [-1,0,-1,1,0,1,0,0]
@@ -132,8 +136,8 @@ dz = [0,0,0,0,0,0,1,-1]
 
 
 #val
-delta_dim=1; # valeur de la dimention 1 micron
-delta_t=1; # valeur de la variation de temps
+delta_dim=10**(-6); # valeur de la dimention 1 micron
+delta_t=10**(-6); # valeur de la variation de temps
 D=10**-5; #valeur du coe de diff   m^2/sece
 Vcell=np.sqrt(3/2)*(delta_dim**3);
 nu_kin=133; # micro metre/sec
@@ -166,13 +170,13 @@ vap=np.zeros([dimx,dimy,dimz])
 fron=np.zeros([dimx,dimy,dimz])
 
 #test glace
-ice[100,101,1]=1
-ice[100,100,1]=1
+ice[5,50,50]=1
+ice[1,1,1]=1
 
-vap[0,0,0]=100
-
+vap[0,0,0]=1
+#x et z invercer???
 #comme on va fair les image pour le moment 
-#plt.imshow(sum(ice),interpolation='spline16', cmap='viridis')
+#plt.imshow(np.sum(ice,axis=0),interpolation='spline16', cmap='viridis')
 
 
 
