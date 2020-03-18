@@ -6,7 +6,7 @@ Created on Tue Mar 10 12:04:51 2020
 """
 
 import numpy as np
-
+import matplotlib.pyplot as plt 
 
 #FONCTION
 ###############################################################################
@@ -22,8 +22,35 @@ def inbox(i,j,k,dimx,dimy,dimz):
 
 
 
-#def diffusion(vap):
+def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
+     vapout=vap
+     for a in range(0,dimx):
+         for b in range(0,dimy):
+             for c in range(0,dimz):
+                 sum1=0
+                 sum2=0
+                 if not in_crystal(a,b,c,ice,dimx,dimy,dimz):
+                     for d in range(0,6):
+                         #print(vap[[a]+dx[d],b+dy[d],c+dz[d]])
+                         #print(in_crystal(a+dx[d],b+dy[d],c+dz[d],ice,dimx,dimy,dimz))
+                         if in_crystal(a+dx[d],b+dy[d],c+dz[d],ice,dimx,dimy,dimz) == False:
+                             sum1=(sum1+vap[a,b,c])
+                         else:
+                             sum1=(sum1+vap[a+dx[d],b+dy[d],c+dz[d]])
+                     for e in range(6,8):
+                        print(c+dz[e])#(in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz))
+                        if  in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz):
+                            #print(vap[a+dx[e],b+dy[e],c+dz[e]])
+                            #pas bon doit etre la condition haaaaaaaaaaaa
+                            sum2=sum2+vap[a,b,c]   
+                        else: 
+                            sum2=sum2+vap[a+dx[e],b+dy[e],c+dz[e]]
+                            
+                     vapout[a,b,c]=(2/3)*(delta_tau)*sum1+(delta_tau)*sum2+(1-6*delta_tau)*vap[a,b,c]
     
+     return vapout
+
+
 #fonction qui convertira la vapeur en glace
 #def conversion(ice,fron,vap):
     
@@ -34,54 +61,69 @@ def inbox(i,j,k,dimx,dimy,dimz):
     
     
 #valide si le poin donner est dans le cristal     
-def in_crystal(i,j,k,ice):
-    if ice[i,j,k]==1:
-        in_ice=True 
+def in_crystal(i,j,k,ice,dimx,dimy,dimz):
+    if inbox(i,j,k,dimx,dimy,dimz):
+        if ice[i,j,k]==1:
+            in_ice=True 
+        else:
+            in_ice=False
     else:
         in_ice=False
-        
     return in_ice
 
 # fonction qui retourne la frontiere en transtion 
-def frontiere(ice,dx,dy,dz):
+def frontiere(ice,dx,dy,dz,dimx,dimy,dimz):
     icepos=np.argwhere(ice==1)
     fronpos=[]
     for a in range(0,np.shape(icepos)[0]):
         for b in range(0,8):
+            #print(icepos[a])
+            #print(dx[b])
+            #print(dy[b])
+            #print(dz[b])
             pos=[icepos[a]+[dx[b],dy[b],dz[b]]] 
             #print(pos)
-            if in_crystal(pos[0],pos[1],pos[2],ice) :
+            #print(pos[0][0])
+            #print(pos[0][1])
+            #print(pos[0][2])
+            #print(inbox(pos[0][0],pos[0][1],pos[0][2],dimx,dimy,dimz))
+            if  ((inbox(pos[0][0],pos[0][1],pos[0][2],dimx,dimy,dimz)) == False):
+                pass
+            elif in_crystal(pos[0][0],pos[0][1],pos[0][2],ice,dimx,dimy,dimz) :
                 pass
             else:
-                fronpos.append(pos)
-            
+                #p=((inbox(pos[0][0],pos[0][1],pos[0][2],dimx,dimy,dimz)) == False)
+                #print(p)
+                fronpos.append(pos[0])
+    #peut etre retourner une matrice a la place ?
     return fronpos
+
+
 
 
 
 #np.append(fronpos,icepos[a]+np.array([dx[b],dy[b],dz[b]]))
 
+#update frontiere
+
 # fonction in frontiere
 def infron(i,j,k,fronpos):
-    
     for a in fronpos:
         if fronpos(a)[0]==i and  fronpos(a)[1]==j and  fronpos(a)[2]==k:
             infr=True
         else:
-            infr=False  
-        
-        return infr
+            infr=False          
+    return infr
 
 
     
 ###############################################################################
 
 
-
 #init variable 
-dimx=16; #dimention x  ect
-dimy=16;
-dimz=16;
+dimx=255; #dimention x  ect
+dimy=255;
+dimz=10;
 
 #init des vecteur pour regarder les plus proche voisin
 dx = [-1,0,-1,1,0,1,0,0]
@@ -90,12 +132,12 @@ dz = [0,0,0,0,0,0,1,-1]
 
 
 #val
-deltadim=1; # valeur de la dimention 1 micron
-deltat=1; # valeur de la variation de temps
+delta_dim=1; # valeur de la dimention 1 micron
+delta_t=1; # valeur de la variation de temps
 D=10**-5; #valeur du coe de diff   m^2/sece
-Vcell=np.sqrt(3/2)*(deltadim**3);
+Vcell=np.sqrt(3/2)*(delta_dim**3);
 nu_kin=133; # micro metre/sec
-
+delta_tau=(D*delta_t)/(delta_dim)**2
 
 
 
@@ -109,19 +151,28 @@ nu_kin=133; # micro metre/sec
 
 #def mat 
 
+
+# je sais pas pourquoi mais sa chie avec l ordre dim x dim y dim z sa pas dans 
+# le bonne ordre du moin pour les test en 2d je sais pas pourquoi mais 
+# fauderai recrire tout les fonction dans cet ordre different je croi je suis pas sur 
+# mais sa chage rien temp qu on symetrique pour le moment mais quand plot la sum devera etre chenge i guess
+
+
 # mat cristal 0 si pas dans le cristal
-ice=np.zeros([dimx,dimy,dimz]);
+ice=np.zeros([dimx,dimy,dimz])
 # mat vapeur varie enfonction de la densiter deau en éta vapeur entre 0 et 1 ?
-vap=np.zeros([dimx,dimy,dimz]);
+vap=np.zeros([dimx,dimy,dimz])
 #mat de la frontiere
-fron=np.zeros([dimx,dimy,dimz]);
+fron=np.zeros([dimx,dimy,dimz])
 
+#test glace
+ice[100,101,1]=1
+ice[100,100,1]=1
 
+vap[0,0,0]=100
 
-
-
-
-
+#comme on va fair les image pour le moment 
+#plt.imshow(sum(ice),interpolation='spline16', cmap='viridis')
 
 
 
