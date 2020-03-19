@@ -23,7 +23,7 @@ def inbox(i,j,k,dimx,dimy,dimz):
 
 
 def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
-     vapout=vap
+     vapout=np.zeros(np.shape(vap))
      #i=1
      for a in range(0,dimx):
          for b in range(0,dimy):
@@ -32,20 +32,20 @@ def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
                  sum2=0
                  #print(sum1)
                  #print(sum2)
-                 if not in_crystal(a,b,c,ice,dimx,dimy,dimz):
+                 if in_crystal(a,b,c,ice,dimx,dimy,dimz)== False:
                      for d in range(0,6):
                          #print(vap[[a]+dx[d],b+dy[d],c+dz[d]])
                          #print(in_crystal(a+dx[d],b+dy[d],c+dz[d],ice,dimx,dimy,dimz))
-                         if in_crystal(a+dx[d],b+dy[d],c+dz[d],ice,dimx,dimy,dimz) == False:
+                         if in_crystal(a+dx[d],b+dy[d],c+dz[d],ice,dimx,dimy,dimz) == True:
                              sum1=(sum1+vap[a,b,c])
                          elif  (inbox(a+dx[d],b+dy[d],c+dz[d],dimx,dimy,dimz))==False:
                               sum1=(sum1+vap[a,b,c])
                          else:
                              sum1=(sum1+vap[a+dx[d],b+dy[d],c+dz[d]])
-                             print(sum1)
+                             #print(sum1)
                      for e in range(6,8):
                         #print(c+dz[e])#(in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz))
-                        if  in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz):
+                        if  in_crystal(a+dx[e],b+dy[e],c+dz[e],ice,dimx,dimy,dimz)==True:
                             #print(vap[a+dx[e],b+dy[e],c+dz[e]])
                             #pas bon doit etre la condition haaaaaaaaaaaa
                             sum2=sum2+vap[a,b,c]   
@@ -57,9 +57,10 @@ def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
                             sum2=sum2+vap[a+dx[e],b+dy[e],c+dz[e]]
                             #i=i+1
                             #print(i)
-                     print(sum1)
-                     print(sum2)
+                     #print(sum1)
+                     #print(sum2)
                      vapout[a,b,c]=(2/3)*(delta_tau)*sum1+(delta_tau)*sum2+(1-6*delta_tau)*vap[a,b,c]
+                     #print(vap[5,5,5])
     
      return vapout
 
@@ -134,19 +135,19 @@ def infron(i,j,k,fronpos):
 
 
 #init variable 
-dimx=10; #dimention x  ect
-dimy=10;
-dimz=10;
+dimx=50; #dimention x  ect
+dimy=50;
+dimz=5;
 
 #init des vecteur pour regarder les plus proche voisin
-dz = [-1,0,-1,1,0,1,0,0]
+dx = [-1,0,-1,1,0,1,0,0]
 dy = [-1,-1,0,0,1,1,0,0]
-dx = [0,0,0,0,0,0,1,-1]
+dz = [0,0,0,0,0,0,1,-1]
 
 
 #val
-delta_dim=10**(-6); # valeur de la dimention 1 micron
-delta_t=10**(-9); # valeur de la variation de temps
+delta_dim=2*10**(-4); # valeur de la dimention 1 micron
+delta_t=10**(-3); # valeur de la variation de temps
 D=10**-5; #valeur du coe de diff   m^2/sece
 Vcell=np.sqrt(3/2)*(delta_dim**3);
 nu_kin=133; # micro metre/sec
@@ -179,14 +180,29 @@ vap=np.zeros([dimx,dimy,dimz])
 fron=np.zeros([dimx,dimy,dimz])
 
 #test glace
-ice[5,5,5]=1
-ice[1,1,1]=1
+ice[0,10,:]=1
+ice[1,10,:]=1
+ice[2,10,:]=1
+ice[3,10,:]=1
+ice[4,10,:]=1
+ice[5,10,:]=1
+ice[6,10,:]=1
+ice[7,10,:]=1
+ice[8,10,:]=1
+ice[9,10,:]=1
 
-vap[0,0,0]=1
+vap[0,0,:]=1
+vap[49,49,:]=1
 #x et z invercer???
 #comme on va fair les image pour le moment 
 #plt.imshow(np.sum(ice,axis=0),interpolation='spline16', cmap='viridis')
 
+for i in range(0,1000):
+    vap=diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz)
+    
+    
+plt.rcParams["figure.figsize"] = (10,10)
+plt.imshow(np.sum(vap,axis=2),interpolation='spline16', cmap='viridis')
 
 
 

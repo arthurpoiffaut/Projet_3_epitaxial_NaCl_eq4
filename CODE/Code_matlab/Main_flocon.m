@@ -21,7 +21,7 @@ delta_t=10^(-9); % valeur de la variation de temps
 D=10^(-5); %valeur du coe de diff   m^2/sece
 Vcell=sqrt(3/2)*(delta_dim^3);
 nu_kin=133; % micro metre/sec
-delta_tau=(D*delta_t)/(delta_dim)^2;
+delta_tau=(D*delta_t)/(delta_dim)^2;  %(plus peti que 1/6)
 
 %voir poure les autre truc 
 
