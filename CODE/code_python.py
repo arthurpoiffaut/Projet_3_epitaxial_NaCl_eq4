@@ -64,6 +64,17 @@ def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
     
      return vapout
 
+#fonction qui te donne le bon coef de alpha en fonction des voisin
+
+#fonction de relaxation 1 alpha independant de sigma condition au frotiere de la boite sont un source constente
+
+
+
+
+
+
+
+
 
 #fonction qui convertira la vapeur en glace
 #def conversion(ice,fron,vap):
@@ -146,8 +157,8 @@ dz = [0,0,0,0,0,0,1,-1]
 
 
 #val
-delta_dim=2*10**(-4); # valeur de la dimention 1 micron
-delta_t=10**(-3); # valeur de la variation de temps
+delta_dim=20*10**(-5); # valeur de la dimention 1 micron
+delta_t=10**(-4); # valeur de la variation de temps
 D=10**-5; #valeur du coe de diff   m^2/sece
 Vcell=np.sqrt(3/2)*(delta_dim**3);
 nu_kin=133; # micro metre/sec
