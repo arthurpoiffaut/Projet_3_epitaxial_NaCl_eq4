@@ -70,12 +70,6 @@ def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
 
 
 
-
-
-
-
-
-
 #fonction qui convertira la vapeur en glace
 #def conversion(ice,fron,vap):
     
@@ -83,8 +77,7 @@ def diffusion(vap,ice,delta_tau,dx,dy,dz,dimx,dimy,dimz):
 #fonction qui update ce qui fais partie du cristal
 # def update_ice(fron,ice):   
 
-    
-    
+
 #valide si le poin donner est dans le cristal     
 def in_crystal(i,j,k,ice,dimx,dimy,dimz):
     if inbox(i,j,k,dimx,dimy,dimz):
