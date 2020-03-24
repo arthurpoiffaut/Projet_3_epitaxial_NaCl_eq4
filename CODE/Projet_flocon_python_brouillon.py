@@ -399,14 +399,8 @@ delta_tau=(D*delta_t)/(delta_dim)**2
 # sava etre fucking long a rouler....
 
 
-<<<<<<< Updated upstream
-#<<<<<<< Updated upstream
 dimx=40; #dimention x  ect
 dimy=40;
-=======
-dimx=20; #dimention x  ect
-dimy=20;
->>>>>>> Stashed changes
 dimz=10;
 #=======
 dimx=100; #dimention x  ect
@@ -519,16 +513,11 @@ if True: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
 #for i in range(0,200):
 #    vap=relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz)
 plt.rcParams["figure.figsize"] = (10,10)
-<<<<<<< Updated upstream
-#<<<<<<< Updated upstream
-=======
-plt.imshow(np.sum(ice_ini,axis=2),interpolation='spline16', cmap='viridis')
->>>>>>> Stashed changes
 #plt.imshow(np.sum(ice,axis=2),interpolation='spline16', cmap='viridis')
 #=======
-floc=np.sum(ice,axis=2)
-figg=plt.figure()
-plt.imshow(floc,interpolation='spline16', cmap='Blues')
+#floc=np.sum(ice,axis=2)
+#figg=plt.figure()
+#plt.imshow(floc,interpolation='spline16', cmap='Blues')
 
 #figg.savefig('tessssst.png')
 
