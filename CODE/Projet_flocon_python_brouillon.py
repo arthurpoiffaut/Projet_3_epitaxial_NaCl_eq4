@@ -174,7 +174,7 @@ def nun(alpha,Cvap,nu_kin):
     nu_n=alpha*Cvap*nu_kin
     return nu_n
 
-#fonction  de la hauteur croissence 
+#fonction  de la hauteur croissance 
 def delta_L(nu_n,temp):
      #pas sur i des probleme avec Cvap des foi je met just pour voir ce que sa 
     #donne passen le probleme des vap peur null pour plus tard( pou nu_n)
@@ -187,7 +187,7 @@ def delta_L(nu_n,temp):
         dL=1
     return dL
 
-# fonction qui calule le temp croissence pour une cellule se remplise
+# fonction qui calule le temp croissance pour une cellule se remplise
 def tcroi(longeur,nu_n): #longeur qui reste a croite
     #pas sur i des probleme avec Cvap des foi je met just pour voir ce que sa 
     #donne passen le probleme des vap peur null pour plus tard( pou nu_n)
@@ -199,7 +199,7 @@ def tcroi(longeur,nu_n): #longeur qui reste a croite
 
 
 
-#Fonction pour croissence
+#Fonction pour croissance
 ###############################################################################
 
 
@@ -293,7 +293,7 @@ def tmin(fron_state,delta_dim,ratio_c,T,m,dx,dy,dz,dimx,dimy,dimz,ice):
 
 
 
-def croissence(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m,delta_dim,t_min):
+def croissance(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m,delta_dim,t_min):
     for a in range(0,np.shape(fron_state)[0]):
         alpha=valapha(int(fron_state[a][0]),int(fron_state[a][1]),int(fron_state[a][2]),dx,dy,dz,dimx,dimy,dimz,ice)
         #print("postion:")
@@ -353,8 +353,28 @@ def update_fron(fron_state,Lcell,ice,dx,dy,dz,dimx,dimy,dimz):
 
 
 
+#Prends la matrice 2D (''écrasée'') contenant l'image du flocon et l'hexagonifie
+#Sauvegarde aussi l'image obtennue au même endoit où le code .py est enregistré
+def hexplot(matflocon):
+    hexagonal = np.empty((2,dimx,dimy)) #array contenant les points hex
+    n = np.array([1., -1./np.sqrt(3.)]) #vecteurs de la base hexagonale
+    m = np.array([1., 1./np.sqrt(3.)])
+    for i in range(dimx):
+        for j in range(dimy):
+            hexagonal[:,i,j] = int(i)*n + int(j)*m
+    index_flocon = np.where(matflocon >= 1)  #0 si on veut tous les points de la matrice.
+    flocon = hexagonal[:,index_flocon[0],index_flocon[1]]
+    fig = plt.figure()
+    plt.scatter(flocon[0,:], flocon[1,:], c =matflocon[index_flocon[0],\
+                 index_flocon[1]]-1., s = 10., \
+                    cmap = 'cubehelix', marker = 'H') # s est la taille des points scatter
+    plt.axis("off")
+    fig.savefig('testfloconhex_'+'mx'+str(dimx)+'my'+str(dimy)+'.png')
+    plt.show()
+
+
 #################################################################################
-#fin des truc qui seron peut etre enlever
+#fin des truc qui seront peut etre enlever
 
 #Initialisation
 ###############################################################################
@@ -403,9 +423,9 @@ dimx=40; #dimention x  ect
 dimy=40;
 dimz=10;
 #=======
-dimx=100; #dimention x  ect
-dimy=100;
-dimz=4;
+#dimx=100; #dimention x  ect
+#dimy=100;
+#dimz=4;
 #>>>>>>> Stashed changes
 
 
@@ -482,7 +502,7 @@ if True: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
 
         t_min=tmin(fron_state,delta_dim,ratio_c,T,m,dx,dy,dz,dimx,dimy,dimz,ice_c)    
         
-        fron_state_c=croissence(dx,dy,dz,dimx,dimy,dimz,ice_c,fron_state,vap,ratio_c,T,m,delta_dim,t_min)
+        fron_state_c=croissance(dx,dy,dz,dimx,dimy,dimz,ice_c,fron_state,vap,ratio_c,T,m,delta_dim,t_min)
         
         out_up=update_fron(fron_state_c,Lcell,ice_c,dx,dy,dz,dimx,dimy,dimz)
         
@@ -497,7 +517,7 @@ if True: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
         #frameice.append(ice_ini)
         framet.append(t_min)
         #else:
-          #  fron_state=croissence(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m)
+          #  fron_state=croissance(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m)
           #  fron_state=fron_state=update_fron(fron_state,Vcell,ice,dx,dy,dz,dimx,dimy,dimz)
           #  print(i3)
 
