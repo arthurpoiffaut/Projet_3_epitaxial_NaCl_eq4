@@ -75,7 +75,7 @@ def frontiere(ice,dx,dy,dz,dimx,dimy,dimz):
                 pass
             elif in_crystal(Vpos[b][0],Vpos[0][1],Vpos[b][2],ice,dimx,dimy,dimz) :
                 pass
-          
+          #plus pop^^^^
             else:
                 fronpos.append(Vpos[b])
                 #print(np.sum((np.array(fronpos)==pos).all(axis=1))>1)
@@ -110,8 +110,7 @@ def infron(i,j,k,fronpos):
 
 # Fonction qui calcule la constente de drain
 def K(alpha,D,delta_dim,T,m):
-    acc=1
-    K=acc*alpha*((2*delta_dim)/(np.sqrt(3)*D))*np.sqrt((spc.k*T)/(2*spc.pi*m))
+    K=alpha*((2*delta_dim)/(np.sqrt(3)*D))*np.sqrt((spc.k*T)/(2*spc.pi*m))
     return K
 
 # Fonction qui calcule nu_kin
@@ -192,11 +191,11 @@ def tcroi(longeur,nu_n): #longeur qui reste a croite
     #pas sur i des probleme avec Cvap des foi je met just pour voir ce que sa 
     #donne passen le probleme des vap peur null pour plus tard( pou nu_n)
     if nu_n==0:
-        tc=float("inf")
+        tc=0
     else:
         tc=(longeur)/nu_n
     return tc
-
+#nan
 
 
 #Fonction pour croissence
@@ -290,7 +289,7 @@ def tmin(fron_state,delta_dim,ratio_c,T,m,dx,dy,dz,dimx,dimy,dimz,ice):
     #print(list_tc)
     t_min=min(list_tc)
     return t_min
-
+#dLcell
 
 
 def croissence(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m,delta_dim,t_min):
@@ -403,9 +402,9 @@ dimx=40; #dimention x  ect
 dimy=40;
 dimz=10;
 #=======
-dimx=100; #dimention x  ect
-dimy=100;
-dimz=4;
+#dimx=100; #dimention x  ect
+#dimy=100;
+#dimz=4;
 #>>>>>>> Stashed changes
 
 
@@ -484,12 +483,12 @@ if True: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
         
         fron_state_c=croissence(dx,dy,dz,dimx,dimy,dimz,ice_c,fron_state,vap,ratio_c,T,m,delta_dim,t_min)
         
-        out_up=update_fron(fron_state_c,Lcell,ice_c,dx,dy,dz,dimx,dimy,dimz)
+        update=update_fron(fron_state_c,Lcell,ice_c,dx,dy,dz,dimx,dimy,dimz)
         
-        fron_state=out_up[0]
-        ice_ini=out_up[1]
+        fron_state=update[0]
+        ice_ini=update[1]
         
-        
+        #crl !!!!!!!!!!!!!!!!!!!!
         framef.append(fron_state)
         #print(fron_state)
         #plt.imshow(np.sum(ice_ini,axis=2),interpolation='spline16', cmap='viridis')
