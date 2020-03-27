@@ -118,13 +118,15 @@ def frontiere(ice,dx,dy,dz,dimx,dimy,dimz):
 # fonction in frontiere
 def infron(i,j,k,fronpos):
     infr=[]
+    pos=[]
     for a in range(0,np.shape(fronpos)[0]):
         if fronpos[a][0]==i and  fronpos[a][1]==j and  fronpos[a][2]==k:
             infr.append(True)
+            pos=[fronpos[a][0],fronpos[a][1],fronpos[a][2],a]
         else:
             infr.append(False) 
     if sum(infr)>=1:
-        return [fronpos[a][0],fronpos[a][1],fronpos[a][2],a]
+        return [pos[0],pos[1],pos[2],pos[3]]
     else:
         return 0
 
@@ -157,11 +159,11 @@ def valapha(i,j,k,dx,dy,dz,dimx,dimy,dimz,ice):
              V=V+1
     #On donne la valeur de alpha (on set tu les val dansla fonction ou dans le code je sais pas)
     if  V==1 and H==0:
-        alpha=0.01 # valeur pour vertical
+        alpha=0.1 # valeur pour vertical
     elif V<=1 and H==1:
         alpha=0.5 # valeur pour horizontal pour les autre  (pas sur revoir article)
     elif H==2 and V==0:
-        alpha=0.1
+        alpha=0.2
     elif H==0 and V==0:
         alpha=0
     else:
@@ -213,6 +215,7 @@ def tcroi(longeur,nu_n): #longeur qui reste a croite
     #pas sur i des probleme avec Cvap des foi je met just pour voir ce que sa 
     #donne passen le probleme des vap peur null pour plus tard( pou nu_n)
     if nu_n==0:
+        print("ha")
         tc=0
     else:
         tc=(longeur)/nu_n
@@ -241,8 +244,8 @@ def relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz):
                   #  print(b)
                    # print(c)
                 if in_crystal(a,b,c,ice,dimx,dimy,dimz)== False:
-                    if infron(a,b,c,fronpos)==True:
-                        #print(True)
+                    if infron(a,b,c,fronpos)!=0:
+                       # print("True")
                         Vpos=voisin(a,b,c,dx,dy,dz)
                         alpha=valapha(a,b,c,dx,dy,dz,dimx,dimy,dimz,ice)
                         #print(alpha)
@@ -266,6 +269,8 @@ def relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz):
                     elif frontbox(a,b,c,dimx,dimy,dimz) == True:
                         vap_out[a,b,c]=sigma_limit
                     else:
+                        #copy()
+                        #print("oui")
                         Vpos=voisin(a,b,c,dx,dy,dz)
                         for f in range(0,6):
                             if in_crystal(Vpos[f][0],Vpos[f][1],Vpos[f][2],ice,dimx,dimy,dimz) == True:
@@ -273,6 +278,7 @@ def relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz):
                             elif  inbox(Vpos[f][0],Vpos[f][1],Vpos[f][2],dimx,dimy,dimz)==False:
                                 sum1=sum1+vap[a,b,c]
                             else:
+                                #print("oui")
                                 sum1=sum1+vap[int(Vpos[f][0]),int(Vpos[f][1]),int(Vpos[f][2])] 
                             
                         for g in range(6,8):
@@ -315,7 +321,8 @@ def tmin(fron_state,delta_dim,ratio_c,T,m,dx,dy,dz,dimx,dimy,dimz,ice,Lcell):
 
 
 def croissance(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m,delta_dim,t_min):
-    fron_state_c=fron_state
+    fron_state_c=fron_state.copy()
+    fron_state_ini=fron_state.copy()
     for a in range(0,np.shape(fron_state)[0]):
         alpha=valapha(int(fron_state[a][0]),int(fron_state[a][1]),int(fron_state[a][2]),dx,dy,dz,dimx,dimy,dimz,ice)
         #print("postion:")
@@ -334,7 +341,7 @@ def croissance(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m,delta_dim,
         #print(fron_state[a][3]+a*1000000*dV)
         #new_value=fron_state[a][3]+dV
         #print(dV)
-        fron_state_c[a][3]=fron_state[a][3]+dL
+        fron_state_c[a][3]=(fron_state_ini[a][3]+dL).copy()
         #print(fron_state[a][3]+dL)
     #fron_state_c=fron_state
     return fron_state_c
@@ -353,9 +360,16 @@ def update_fron(fron_state,Lcell,ice,dx,dy,dz,dimx,dimy,dimz):
         #print(a)
         #print(np.shape(fron_state)[0])
         #print(fron_state[a][3])
+        #if fron_state[a][2]==4 or fron_state[a][2]==6:
+                #print(fron_state[a])
         if np.round(fron_state[a][3],8)>=Lcell:
+            #if fron_state[a][2]==4 or fron_state[a][2]==6:
+                #print(fron_state[a])
+                
             #print(fron_state[a][3])
-            print("ice")
+            #print("ice")
+            #print()
+            #print(fron_state[a])
             #p.append(a)
             ice_new[int(fron_state[a][0]),int(fron_state[a][1]),int(fron_state[a][2])]=1
             
@@ -374,7 +388,9 @@ def update_fron(fron_state,Lcell,ice,dx,dy,dz,dimx,dimy,dimz):
     for b in range(0,np.shape(fronpos)[0]):
         pos=infron(fronpos[b][0],fronpos[b][1],fronpos[b][2],fron_state)
         if  pos !=0 :
+            #print(pos)
             fron_state_new.append([fronpos[b][0],fronpos[b][1],fronpos[b][2],fron_state[pos[3]][3]])
+            #print([fronpos[b][0],fronpos[b][1],fronpos[b][2],fron_state[pos[3]][3]])
         else:
             fron_state_new.append([fronpos[b][0],fronpos[b][1],fronpos[b][2],0])
     #fron_state_new=frontiere(ice_new,dx,dy,dz,dimx,dimy,dimz)
@@ -400,11 +416,29 @@ def hexplot(matflocon):
     flocon = hexagonal[:,index_flocon[0],index_flocon[1]]
     fig = plt.figure()
     plt.scatter(flocon[0,:], flocon[1,:], c =matflocon[index_flocon[0],\
-                 index_flocon[1]]-1., s = 1000., \
+                 index_flocon[1]]-1., s = 500., \
                     cmap = 'cubehelix', marker = 'H') # s est la taille des points scatter
     plt.axis("off")
     fig.savefig('testfloconhex_'+'mx'+str(dimx)+'my'+str(dimy)+'.png')
     plt.show()
+
+# fauderai voire  ce qu on peut fai avec sa
+def hexplot2(matflocon,dimx,dimy,name):
+    #xi=np.linspace(0,dimx-1,dimx)
+    #yi=np.linspace(0,dimy-1,dimy)
+    x=[]
+    y=[]
+    z=[]
+    for a in range(0,dimx):
+        for b in range(0,dimy):
+            x.append(a)
+            y.append(b)
+            z.append(matflocon[a,b])
+    fig = plt.figure()
+    
+    plt.hexbin(x,y,z,gridsize=(49,49))
+    
+    fig.savefig('testfloconhex_'+name+'mx'+str(dimx)+'my'+str(dimy)+'.png')
 
 
 #################################################################################
@@ -425,9 +459,9 @@ dz = [0,0,0,0,0,0,1,-1]
 
 # Constent :
 
-delta_dim=10*10**(-6); # valeur de la dimention en metre
+delta_dim=30*10**(-6); # valeur de la dimention en metre
 
-delta_t=1*10**(-9); # valeur de la variation de temps 
+delta_t=10*10**(-9); # valeur de la variation de temps 
 
 T=258 #temperature en kelvin
 
@@ -488,9 +522,9 @@ ice_ini[cx,cy,cz]=1
 vap[cx,cy,cz]=0
 Vposini=voisin(cx,cy,cz,dx,dy,dz)
 # peut les change pour des liste directement
-#for i1 in range(0,6):
-#    ice_ini[int(Vposini[i1,0]),int(Vposini[i1,1]),int(Vposini[i1,2])]=1
-    #vap[int(Vposini[i1,0]),int(Vposini[i1,1]),int(Vposini[i1,2])]=0
+for i1 in range(0,6):
+    ice_ini[int(Vposini[i1,0]),int(Vposini[i1,1]),int(Vposini[i1,2])]=1
+    vap[int(Vposini[i1,0]),int(Vposini[i1,1]),int(Vposini[i1,2])]=0
 #ice_ini=ice
 #pa trop sur pour la condition initiale de la glace mais on vera bien 
 
@@ -518,21 +552,34 @@ for i2 in range(0,np.shape(fronpos_ini)[0]):
 #Simulation
 ###############################################################################
 plt.rcParams["figure.figsize"] = (10,10)
-framev=[]
-frameice=[]
-framet=[]
-framef=[]
-
-if True: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
-    for i3 in range(0,25):
+if False:
+    framev=[]
+    frameice=[]
+    framet=[]
+    framef=[]
+    frameice.append(ice_ini.copy())
+if False: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
+    for i3 in range(0,100):
         print(i3)
         print(np.sum(ice_ini))
         print()
         ice_c=ice_ini
-        for  i4 in range(0,100):
-            vap=relax1(vap,ice_c,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz)
-            if i4==0 or i4==48 or i4==49:
-                framev.append(vap)
+        vap_ini=vap
+        continuer=True
+        i4=0
+        while  continuer:
+            vap_c=relax1(vap_ini,ice_c,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz)
+            
+            i4=i4+1
+            if (abs(vap_c-vap_ini).all()<0.0005) and i4>=5:
+                framev.append(vap_c.copy())
+                vap_ini=vap_c
+                continuer=False
+                print()
+                print(i4)
+                print()
+            else:
+                vap_ini=vap_c
 
         t_min=tmin(fron_state,delta_dim,ratio_c,T,m,dx,dy,dz,dimx,dimy,dimz,ice_c,Lcell)  
         
@@ -544,16 +591,9 @@ if True: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
         ice_ini=update[1]
         
         #crl !!!!!!!!!!!!!!!!!!!!
-        framef.append(fron_state)
-        #print(fron_state)
-        #plt.imshow(np.sum(ice_ini,axis=2),interpolation='spline16', cmap='viridis')
-        #frameice.append(i3)
-        frameice.append(ice_ini)
-        framet.append(t_min)
-        #else:
-          #  fron_state=croissance(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m)
-          #  fron_state=fron_state=update_fron(fron_state,Vcell,ice,dx,dy,dz,dimx,dimy,dimz)
-          #  print(i3)
+        framef.append(fron_state.copy())
+        frameice.append(ice_ini.copy())
+        framet.append(t_min.copy())
 
 
 
