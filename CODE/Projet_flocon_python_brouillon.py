@@ -291,7 +291,7 @@ def relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz):
                         #vap_out[a,b,c]=(2/3)*(delta_tau)*sum1+(delta_tau)*sum2+(1-6*delta_tau)*vap[a,b,c]
                         vap_out[a,b,c]=((2/3)*sum1+sum2)/6
                 else:
-                    vap_out[a,b,c]=0
+                    vap_out[a,b,c]=np.nan
 
     return vap_out
                     
@@ -412,7 +412,7 @@ def hexplot(matflocon):
     for i in range(dimx):
         for j in range(dimy):
             hexagonal[:,i,j] = int(i)*n + int(j)*m
-    index_flocon = np.where(matflocon >= 1)  #0 si on veut tous les points de la matrice.
+    index_flocon = np.where(matflocon >= 1)  #0 sion veut tous les points de la matrice.
     flocon = hexagonal[:,index_flocon[0],index_flocon[1]]
     fig = plt.figure()
     plt.scatter(flocon[0,:], flocon[1,:], c =matflocon[index_flocon[0],\
@@ -423,22 +423,40 @@ def hexplot(matflocon):
     plt.show()
 
 # fauderai voire  ce qu on peut fai avec sa
-def hexplot2(matflocon,dimx,dimy,name):
+def hexplot2(frameflocon,dimx,dimy,name):
     #xi=np.linspace(0,dimx-1,dimx)
     #yi=np.linspace(0,dimy-1,dimy)
-    x=[]
-    y=[]
-    z=[]
-    for a in range(0,dimx):
-        for b in range(0,dimy):
-            x.append(a)
-            y.append(b)
-            z.append(matflocon[a,b])
-    fig = plt.figure()
-    
-    plt.hexbin(x,y,z,gridsize=(49,49))
-    
-    fig.savefig('testfloconhex_'+name+'mx'+str(dimx)+'my'+str(dimy)+'.png')
+    hexagonal = np.empty((2,dimx,dimy)) #array contenant les points hex
+    n = np.array([1., -1./np.sqrt(3.)]) #vecteurs de la base hexagonale
+    m = np.array([1., 1./np.sqrt(3.)])
+    for a in range(0,np.shape(frameflocon)[0]):
+        x=[]
+        y=[]
+        z=[]
+        f='frame'+str(a)
+        #matflocon=frameflocon[a][:,:,7]  # pour la vapeur dernier depen du centre
+        matflocon=np.sum(frameflocon[a],axis=2) #pour la glace
+        for b in range(0,dimx):
+            for c in range(0,dimy):
+                hexagonal[:,b,c] = int(b)*n + int(c)*m
+                x.append( hexagonal[0,b,c])
+                y.append( hexagonal[1,b,c])
+                z.append(matflocon[b,c])
+        
+        index_flocon = np.where(matflocon >= 1) #depende de ce qu on veu prendre
+         
+        maxx=max(hexagonal[0,index_flocon[0],index_flocon[1]])
+        maxy=max(hexagonal[1,index_flocon[0],index_flocon[1]])
+        
+        minx=min(hexagonal[0,index_flocon[0],index_flocon[1]])
+        miny=min(hexagonal[1,index_flocon[0],index_flocon[1]])
+        
+        fig = plt.figure()
+        
+        plt.hexbin(x,y,z,gridsize=(dimx-1,dimy-1))
+        plt.xlim(minx-5,maxx+5)
+        plt.ylim(miny-5,maxy+5)
+        fig.savefig('testfloconhex_'+name+'mx'+str(dimx)+'my'+str(dimy)+f+'.png')
 
 
 #################################################################################
@@ -487,9 +505,9 @@ delta_tau=(D*delta_t)/(delta_dim)**2
 # sava etre fucking long a rouler....
 
 
-dimx=50; #dimention x  ect
-dimy=50;
-dimz=10;
+dimx=100; #dimention x  ect
+dimy=100;
+dimz=13;
 #=======
 #dimx=100; #dimention x  ect
 #dimy=100;
@@ -520,11 +538,27 @@ cz=int((dimz+1)/2)
 
 ice_ini[cx,cy,cz]=1
 vap[cx,cy,cz]=0
-Vposini=voisin(cx,cy,cz,dx,dy,dz)
+Vposini1=voisin(cx,cy,cz,dx,dy,dz)
 # peut les change pour des liste directement
+
 for i1 in range(0,6):
-    ice_ini[int(Vposini[i1,0]),int(Vposini[i1,1]),int(Vposini[i1,2])]=1
-    vap[int(Vposini[i1,0]),int(Vposini[i1,1]),int(Vposini[i1,2])]=0
+    ice_ini[int(Vposini1[i1,0]),int(Vposini1[i1,1]),int(Vposini1[i1,2])]=1
+    Vposini2=voisin(int(Vposini1[i1,0]),int(Vposini1[i1,1]),int(Vposini1[i1,2]),dx,dy,dz)    
+    for i2 in range(0,6):
+        ice_ini[int(Vposini2[i2,0]),int(Vposini2[i2,1]),int(Vposini2[i2,2])]=1
+        Vposini3=voisin(int(Vposini2[i2,0]),int(Vposini2[i2,1]),int(Vposini2[i2,2]),dx,dy,dz)
+        for i3 in range(0,6):
+            ice_ini[int(Vposini3[i3,0]),int(Vposini3[i3,1]),int(Vposini3[i3,2])]=1
+            Vposini4=voisin(int(Vposini3[i3,0]),int(Vposini3[i3,1]),int(Vposini3[i3,2]),dx,dy,dz)
+            for i4 in range(0,6):
+                ice_ini[int(Vposini4[i4,0]),int(Vposini4[i4,1]),int(Vposini4[i4,2])]=1
+                Vposini5=voisin(int(Vposini4[i4,0]),int(Vposini4[i4,1]),int(Vposini4[i4,2]),dx,dy,dz)
+                for i5 in range(0,6):
+                    ice_ini[int(Vposini5[i5,0]),int(Vposini5[i5,1]),int(Vposini5[i5,2])]=1
+                   
+        
+        
+        
 #ice_ini=ice
 #pa trop sur pour la condition initiale de la glace mais on vera bien 
 
@@ -559,7 +593,7 @@ if False:
     framef=[]
     frameice.append(ice_ini.copy())
 if False: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
-    for i3 in range(0,100):
+    for i3 in range(0,300):
         print(i3)
         print(np.sum(ice_ini))
         print()
@@ -594,6 +628,9 @@ if False: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
         framef.append(fron_state.copy())
         frameice.append(ice_ini.copy())
         framet.append(t_min.copy())
+        
+        if (fron_state==np.array([dimx-2,dimy-2,dimz-2,np.nan])).any() or (fron_state==np.array([1,1,1,np.nan])).any():
+            break
 
 
 
