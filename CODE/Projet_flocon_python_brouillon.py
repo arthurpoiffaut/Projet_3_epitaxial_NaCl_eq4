@@ -11,13 +11,13 @@ import matplotlib.pyplot as plt
 import scipy.constants as spc
 
 
-#FONCTION
+#FONCTIONS
 ###############################################################################
 
 
-#Fonction simple
+#Fonctions simples
 ###############################################################################
-#fonction qui valide si le poin est dans la boit du croisence 
+#Fonction qui valide si le point est dans la boîte de croissance 
 
 def inbox(i,j,k,dimx,dimy,dimz):
     if i >= 0 and i < dimx and j >= 0 and j < dimy and k>=0 and k<dimz:
@@ -33,7 +33,7 @@ def frontbox(i,j,k,dimx,dimy,dimz):
         front_box = False
     return front_box
 
-# Fonction voisin qui te revoi les voisin d'un point
+#Fonction voisin qui renvoit les voisins d'un point
 def voisin( i,j,k,dx,dy,dz):
     Vpos=np.zeros([8,3]).astype(int)
     for a in range(0,8):
@@ -41,10 +41,10 @@ def voisin( i,j,k,dx,dy,dz):
         Vpos[a,1]=j+dy[a]
         Vpos[a,2]=k+dz[a]
     return Vpos
-#pourrai simplifier la lecture du code je vais pas reecrire tout les fonction avec mais 
+#pourrait simplifier la lecture du code je vais pas reecrire toutes les fonctions avec mais 
 # je le ferai eventuellement
 
-#Fonction valide si le poin donner est dans le cristal     
+#Fonction valide si le point donné est dans le cristal     
 def in_crystal(i,j,k,ice,dimx,dimy,dimz):
     i=int(i)#y a un bug il veul toujour des int ...
     j=int(j)
@@ -60,7 +60,7 @@ def in_crystal(i,j,k,ice,dimx,dimy,dimz):
         in_ice=False
     return in_ice
 
-# fonction qui retourne la frontiere en transtion 
+#Fonction qui retourne la frontiere en transition 
 #def frontiere(ice,dx,dy,dz,dimx,dimy,dimz):
 #    icepos=np.argwhere(ice==1)
 #    fronpos=[]
@@ -115,7 +115,7 @@ def frontiere(ice,dx,dy,dz,dimx,dimy,dimz):
     
     return fronpos
 
-# fonction in frontiere
+#Fonction in frontiere
 def infron(i,j,k,fronpos):
     infr=[]
     pos=[]
@@ -132,18 +132,18 @@ def infron(i,j,k,fronpos):
 
 
 
-# Fonction qui calcule la constente de drain
+#Fonction qui calcule la constante de drain
 def K(alpha,D,delta_dim,T,m):
     K=alpha*((2*delta_dim)/(np.sqrt(3)*D))*np.sqrt((spc.k*T)/(2*spc.pi*m))
     return K
 
-# Fonction qui calcule nu_kin
+#Fonction qui calcule nu_kin
 def nukin(ratio_c,T,m):
     nu_kin=ratio_c*np.sqrt((spc.k*T)/(2*spc.pi*m))
     return nu_kin
     
     
-#fonction qui te donne le bon coef de alpha en fonction des voisin
+#fonction qui donne le bon coefficent de alpha en fonction des voisins
 def valapha(i,j,k,dx,dy,dz,dimx,dimy,dimz,ice):
     Vpos=voisin(i,j,k,dx,dy,dz)
     #print()
@@ -173,18 +173,18 @@ def valapha(i,j,k,dx,dy,dz,dimx,dimy,dimz,ice):
     #print("V")
     #print(V)
     return alpha 
-#Note peu probablement etre amélioré genr just compter des vrai et des fau ?
+#Note: peut probablement etre amélioré genre juste compter des vrais et des faux ?
 
 
 
-#fonction qui calcule deltaV
+#Fonction qui calcule deltaV
 def deltaV(alpha,Cvap,nu_kin,delta_dim,delta_t):
     acc=1
     dV=acc*alpha*nu_kin*Cvap*(delta_dim**2)*delta_t
     return dV
 
 
-#fonction de la vitesse de surface normal
+#Fonction de la vitesse de surface normale
 
 def nun(alpha,Cvap,nu_kin):
     #print("Cvap")
@@ -197,12 +197,12 @@ def nun(alpha,Cvap,nu_kin):
     nu_n=alpha*Cvap*nu_kin
     return nu_n
 
-#fonction  de la hauteur croissance 
+#Fonction de la hauteur de croissance 
 def delta_L(nu_n,temp):
-     #pas sur i des probleme avec Cvap des foi je met just pour voir ce que sa 
-    #donne passen le probleme des vap peur null pour plus tard( pou nu_n)
+     #pas sur i des problemes avec Cvap des fois je mets juste pour voir ce que ca 
+    #donne passen le probleme des vapeurs nulles pour plus tard( pou nu_n)
     dL=nu_n*temp
-    if nu_n==0: #pas sur brian mais sa deverai marcher
+    if nu_n==0: #pas sur brian mais ca devrait marcher
         #print("temp")
         #print(temp)
         #print("v")
@@ -210,10 +210,10 @@ def delta_L(nu_n,temp):
         dL=1
     return dL
 
-# fonction qui calule le temp croissance pour une cellule se remplise
-def tcroi(longeur,nu_n): #longeur qui reste a croite
-    #pas sur i des probleme avec Cvap des foi je met just pour voir ce que sa 
-    #donne passen le probleme des vap peur null pour plus tard( pou nu_n)
+#Fonction qui calule le temps de croissance pour qu'une cellule se remplisse
+def tcroi(longeur,nu_n): #longueur restant à croître
+    #pas sur i des problemes avec Cvap des fois je mets juste pour voir ce quecsa 
+    #donne passen le probleme des vapeurs nulles pour plus tard( pou nu_n)
     if nu_n==0:
         print("ha")
         tc=0
@@ -229,8 +229,8 @@ def tcroi(longeur,nu_n): #longeur qui reste a croite
 
          
 
-#fonction de relaxation 1 alpha independant de sigma 
-#condition au frotiere de la boite sont un source constente
+#Fonction de relaxation 1, alpha independant de sigma 
+#condition aux frotières de la boîte, sont une source constante
 def relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz):
     vap_out=np.zeros(np.shape(vap))
     fronpos=frontiere(ice,dx,dy,dz,dimx,dimy,dimz)
@@ -295,13 +295,13 @@ def relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz):
 
     return vap_out
                     
-#fonction de relaxation 2 alpha dependant de sigma 
-#condition au frotiere de la boite sont un source constente??
+#Fonction de relaxation 2, alpha dependant de sigma 
+#Condition aux frontières de la boîte sont une source constante??
 
 
 
 
-#fonction qui trouve le temp minimal pour l une des cellule se remplice
+#Fonction qui trouve le temps minimal pour que l'une des cellules se remplisse
 def tmin(fron_state,delta_dim,ratio_c,T,m,dx,dy,dz,dimx,dimy,dimz,ice,Lcell):
     list_tc=[]
     for a in range(0,np.shape(fron_state)[0]):
@@ -346,12 +346,12 @@ def croissance(dx,dy,dz,dimx,dimy,dimz,ice,fron_state,vap,ratio_c,T,m,delta_dim,
     #fron_state_c=fron_state
     return fron_state_c
             
-#fron_stat plus sur si les position de dans c<Est un peu con je suis pas sur
+#fron_stat plus sur si les positions de dans c'est un peu con je suis pas sur
     
 
 
 
-#fonction qui update la matrice ice et la liste frontiere
+#Fonction qui update la matrice ice et la liste frontiere
 def update_fron(fron_state,Lcell,ice,dx,dy,dz,dimx,dimy,dimz):
     fron_state_new=[]
     ice_new=ice
@@ -422,7 +422,8 @@ def hexplot(matflocon):
     fig.savefig('testfloconhex_'+'mx'+str(dimx)+'my'+str(dimy)+'.png')
     plt.show()
 
-# fauderai voire  ce qu on peut fai avec sa
+# faudraiT voir  ce qu'on peut faire avec cela
+#Fonction pour un affichage en hexagone #2 
 def hexplot2(frameflocon,dimx,dimy,name):
     #xi=np.linspace(0,dimx-1,dimx)
     #yi=np.linspace(0,dimy-1,dimy)
@@ -459,9 +460,8 @@ def hexplot2(frameflocon,dimx,dimy,name):
         fig.savefig('testfloconhex_'+name+'mx'+str(dimx)+'my'+str(dimy)+f+'.png')
 
 
-#################################################################################
-#fin des truc qui seront peut etre enlever
 
+###############################################################################
 #Initialisation
 ###############################################################################
 
@@ -469,77 +469,91 @@ def hexplot2(frameflocon,dimx,dimy,name):
 
 
 
-#init des vecteur pour regarder les plus proche voisin
+#Initiation des vecteurs pour regarder les plus proches voisins
 dx = [-1,0,-1,1,0,1,0,0]
 dy = [-1,-1,0,0,1,1,0,0]
 dz = [0,0,0,0,0,0,1,-1]
 
 
-# Constent :
+# Constantes :
 
-delta_dim=30*10**(-6); # valeur de la dimention en metre
+delta_dim=30*10**(-6); # valeur de la dimention (m)
 
 delta_t=10*10**(-9); # valeur de la variation de temps 
 
 T=258 #temperature en kelvin
 
-m=2.988*10**(-26)#mase d'un molecule d'eau
+m=2.988*10**(-26)#masse d'une molecule d'eau
 
-D=2*10**-5; #valeur du coe de diff   m^2/sece
+D=2*10**-5; #valeur du coe de diff   (m^2/s)
 
 Vcell=(np.sqrt(3)/2)*(delta_dim**3);
 
-#nu_kin=133; # micro metre/sec en fonction aussi
+#nu_kin=133; # micrometre/s en fonction aussi
 
-ratio_c=1*10**(-6) #pas sur ici fauderai revoir c_sat/c_solide
+ratio_c=1*10**(-6) #pas sur ici faudrait revoir c_sat/c_solide
 
 #c_solide=1*10**(-6)
 
-sigma_limit=1 #concentration au extremiter
+sigma_limit=1 #concentration aux extremitées
 
-#longeur d une  cellule 
+#longueur d'une cellule 
 Lcell=np.round((np.sqrt(3)/2)*(delta_dim),8)
 
 delta_tau=(D*delta_t)/(delta_dim)**2
-# att on doit le fair tendre ver 0 se con 
-# sava etre fucking long a rouler....
+# att on doit le faire tendre vers 0 cest con 
+# ca va etre fucking long a rouler....
 
-
-dimx=100; #dimention x  ect
-dimy=100;
-dimz=13;
+#Dimension en x, y et z du cristal
+dimx=100
+dimy=100
+dimz=13
 #=======
 #dimx=100; #dimention x  ect
 #dimy=100;
 #dimz=4;
-#>>>>>>> Stashed changes
 
 
 
-#def mat 
+
+#Definition de matrices 
 
 # mat cristal 0 si pas dans le cristal
 ice_ini=np.zeros([dimx,dimy,dimz])
-# mat vapeur varie enfonction de la densiter deau en éta vapeur entre 0 et 1 ?
+# mat vapeur varie en fonction de la densité d'eau en état vapeur entre 0 et 1 ?
 vap=np.zeros([dimx,dimy,dimz])
 #mat de la frontiere
 #fron=np.zeros([dimx,dimy,dimz])
 
 
-# etat initiale
+#État initial
 ###############################################################################
 
 vap[:,:,:]=1
-#poin centre
+#Point au centre du cristal (seed)
 cx=int((dimx+1)/2)
 cy=int((dimy+1)/2)
 cz=int((dimz+1)/2)
-# un hexagone au centre 
+#un hexagone au centre 
+
+#Essai pour mettre un hexagone au centre. Il s'agirait d'un hexagone sur grille carrée(cubique)
+#et donc décalé. Pas un vrai hexagone car la grille n'est pas hexagonifiée à l'état initial
+#Forme hexagonale que en x et y. Épaisseur en z constante 
+#Voir fichier FonctionHex.py
+
+#ice_ini[cx,cy,cz]=1
+#ice_ini[cx-1,cy,cz]=1
+#ice_ini[cx-1,cy-1,cz]=1
+#ice_ini[cx,cy-1,cz]=1
+#ice_ini[cx+1,cy,cz]=1
+#ice_ini[cx+1,cy+1,cz]=1
+#ice_ini[cx,cy+1,cz]=1
+
 
 ice_ini[cx,cy,cz]=1
 vap[cx,cy,cz]=0
 Vposini1=voisin(cx,cy,cz,dx,dy,dz)
-# peut les change pour des liste directement
+# peut les changer pour des listes directement
 
 for i1 in range(0,6):
     ice_ini[int(Vposini1[i1,0]),int(Vposini1[i1,1]),int(Vposini1[i1,2])]=1
@@ -560,9 +574,9 @@ for i1 in range(0,6):
         
         
 #ice_ini=ice
-#pa trop sur pour la condition initiale de la glace mais on vera bien 
+#pas trop sur pour la condition initiale de la glace mais on verra bien 
 
-# initalisation de la frontiere 
+#Initalisation de la frontiere 
 fronpos_ini=frontiere(ice_ini,dx,dy,dz,dimx,dimy,dimz)
 fron_state=[]
 
@@ -582,9 +596,10 @@ for i2 in range(0,np.shape(fronpos_ini)[0]):
 #ice[1,2,1]=1
 #print(K(1,D,delta_dim,T,m)*delta_tau)
 
-
+###############################################################################
 #Simulation
 ###############################################################################
+
 plt.rcParams["figure.figsize"] = (10,10)
 if False:
     framev=[]
@@ -592,7 +607,7 @@ if False:
     framet=[]
     framef=[]
     frameice.append(ice_ini.copy())
-if False: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
+if False: #juste pour pas avoir tout commenter à chaque fois que je change de quoi
     for i3 in range(0,300):
         print(i3)
         print(np.sum(ice_ini))
@@ -645,10 +660,10 @@ if False: #just pour pas avoir tout commenter a chaque foi qu eje change de quoi
 #    vap=relax1(vap,ice,delta_tau,delta_dim,D,m,sigma_limit,dx,dy,dz,dimx,dimy,dimz)
 plt.rcParams["figure.figsize"] = (10,10)
 #plt.imshow(np.sum(ice,axis=2),interpolation='spline16', cmap='viridis')
-#=======
+
 #floc=np.sum(ice,axis=2)
 #figg=plt.figure()
 #plt.imshow(floc,interpolation='spline16', cmap='Blues')
 
-#figg.savefig('tessssst.png')
+
 
