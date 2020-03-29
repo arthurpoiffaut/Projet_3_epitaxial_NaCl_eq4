@@ -11,24 +11,39 @@ import matplotlib.pyplot as plt
 
 dimx=100
 dimy=100
+dimz=13
 
-mattest = np.zeros((dimx,dimy))
-mattest[45:55,45:55]=2
-mattest[40:45,40:60]=1
-mattest[55:60,40:60]=1
-mattest[45:55,40:45]=1
-mattest[45:55,55:60]=1
+cx=int((dimx+1)/2)
+cy=int((dimy+1)/2)
+cz=int((dimz+1)/2)
 
+#Initialisation de la matrice test
+mattest = np.zeros((dimx,dimy,dimz))
 
-#mattest[40:45,40:55]=1
-#mattest[45:55,40:60]=1
+#Pour carré
+#mattest[45:55,45:55]=1
+#mattest[40:45,40:60]=1
+#mattest[55:60,40:60]=1
 #mattest[45:55,40:45]=1
-#mattest[55:60,45:60]=1
+#mattest[45:55,55:60]=1
 
-plt.imshow(mattest,interpolation='spline16',cmap='viridis')
+#Pour hexagone
+mattest[cx,cy,cz]=1
+mattest[cx-1,cy,cz]=1
+mattest[cx-1,cy-1,cz]=1
+mattest[cx,cy-1,cz]=1
+mattest[cx+1,cy,cz]=1
+mattest[cx+1,cy+1,cz]=1
+mattest[cx,cy+1,cz]=1
 
 
 
+matrix=np.sum(mattest,axis=2) #image d'une matrice 2D seulement
+
+plt.imshow(matrix,interpolation='spline16',cmap='viridis')
+
+
+#
 
 def hexplot(matflocon):#prend la matrice 2D contenant l'image du flocon et ''l'hexagonifie'' en scatter
     hexagonal = np.empty((2,dimx,dimy)) #array contenant les points hex
@@ -43,9 +58,9 @@ def hexplot(matflocon):#prend la matrice 2D contenant l'image du flocon et ''l'h
     plt.scatter(flocon[0,:], flocon[1,:], c =matflocon[index_flocon[0],\
                  index_flocon[1]]-1., s = 10., \
                     cmap = 'cubehelix', marker = 'H')
-    fig.savefig('testfloconhex_'+'mx'+str(dimx)+'my'+str(dimy)+'.png') #Enregistrement de la figure au même endroit où le code .py est situé
     plt.axis("off")
+    fig.savefig('testfloconhex_'+'mx'+str(dimx)+'my'+str(dimy)+'.png') #Enregistrement de la figure au même endroit où le code .py est situé
     plt.show()
 
 
-hexplot(mattest)
+hexplot(matrix)
