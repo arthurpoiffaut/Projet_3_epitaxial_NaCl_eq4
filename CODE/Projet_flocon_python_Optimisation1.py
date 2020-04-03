@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 import scipy.constants as spc
 import time 
 from joblib import Parallel, delayed # truc de multi proceesing
-
+from scipy.ndimage import convolve
+import os
+import concurrent.futures
 
 #FONCTION DE BASE
 ###############################################################################
@@ -58,26 +60,33 @@ def in_crystal(pos,ice,dim_box):
 
 
 #Fonction qui retourne la frontiere en transition 
-def frontiere(ice,mat_voi,dim_box): # se parallilse mallllllllllll fauderai la repencer mais cest du avec le pop pour en lever les doublon
-        
-    icepos=np.argwhere(ice==1)
-    fronpos=np.zeros([1,3])
+def frontiere(ice,mat_voi_con): # se parallilse mallllllllllll fauderai la repencer mais cest du avec le pop pour en lever les doublon
     
-    for pos1 in icepos :
-        Vpos=voisin(pos1,mat_voi)
-        for pos2 in Vpos:
-            if  inbox(pos2,dim_box) and (in_crystal(pos2,ice,dim_box)==False) :
-                fronpos=np.concatenate((fronpos, [pos2]), axis=0)
+    fronpos_mat=convolve(ice,mat_voi_con)
+    
+    fronpos_mat=fronpos_mat-100*ice
+    
+    fronpos=np.argwhere(fronpos_mat>0)
+    
+    return fronpos
+    # icepos=np.argwhere(ice==1)
+    # fronpos=np.zeros([1,3])
+    
+    # for pos1 in icepos :
+    #     Vpos=voisin(pos1,mat_voi)
+    #     for pos2 in Vpos:
+    #         if  inbox(pos2,dim_box) and (in_crystal(pos2,ice,dim_box)==False) :
+    #             fronpos=np.concatenate((fronpos, [pos2]), axis=0)
                 
             # elif  len(fronpos)>0 and ((np.sum(np.sum((fronpos)==pos2,axis=1)==3).any())>=2):
             #     fronpos.pop()
     
-    fronpos=np.unique(fronpos,axis=0)
-    fronpos=np.delete(fronpos,0,axis=0)
+    # fronpos=np.unique(fronpos,axis=0)
+    # fronpos=np.delete(fronpos,0,axis=0)
 
     
     
-    return fronpos
+    
 
 #fonction qui valide si on est dans la frontiere
 def infron(pos,fronpos):
@@ -181,8 +190,9 @@ def relax1(vap,ice,fron_state,dim_box,mat_voi,sigma_limit,Pos):
         
         sum1=0
         sum2=0
-                
-        if in_crystal(pos1,ice,dim_box)== False:
+        if frontbox(pos1,dim_box) == True:
+                vap_out[pos1[0],pos1[1],pos1[2]]=sigma_limit      
+        elif in_crystal(pos1,ice,dim_box)== False:
             if ((type(infron(pos1,fron_state)))== np.ndarray):   
 #               print("True")
                 Vpos=voisin(pos1,mat_voi)
@@ -208,8 +218,7 @@ def relax1(vap,ice,fron_state,dim_box,mat_voi,sigma_limit,Pos):
                     
                     vap_out[pos1[0],pos1[1],pos1[2]]=((2/3)*sum1+sum2)/(Kval+6)
                             
-            elif frontbox(pos1,dim_box) == True:
-                vap_out[pos1[0],pos1[1],pos1[2]]=sigma_limit
+            
             else:
                 Vpos=voisin(pos1,mat_voi)
                 for i3 in range(0,6):
@@ -229,8 +238,12 @@ def relax1(vap,ice,fron_state,dim_box,mat_voi,sigma_limit,Pos):
                         sum2=sum2+vap[int(Vpos[i4][0]),int(Vpos[i4][1]),int(Vpos[i4][2])]
                         #vap_out[a,b,c]=(2/3)*(delta_tau)*sum1+(delta_tau)*sum2+(1-6*delta_tau)*vap[a,b,c]
                 vap_out[pos1[0],pos1[1],pos1[2]]=((2/3)*sum1+sum2)/6
+                
         else:
             vap_out[pos1[0],pos1[1],pos1[2]]=2#np.nan
+            
+            
+    
 
     return vap_out
                     
@@ -298,7 +311,7 @@ def update_fron(fron_state,ice,mat_voi,dim_box,Lcell):
             
             ice_new[int(state1[0]),int(state1[1]),int(state1[2])]=1
                         
-    state_new=frontiere(ice_new,mat_voi,dim_box)
+    state_new=frontiere(ice_new,mat_voi_con)
 
     for state2 in state_new:
         
@@ -327,6 +340,21 @@ def update_fron(fron_state,ice,mat_voi,dim_box,Lcell):
 
 
 
+#Fonction de sauvegard
+###############################################################################
+def saveframev(it,vap):
+    path=os.getcwd()+'\\Data_save\\Simulation_data_vap\\framev'+str(it)
+    np.save(path,vap)
+    
+def saveframeice(it,ice):
+    path=os.getcwd()+'\\Data_save\\Simulation_data_ice\\framev'+str(it)
+    np.save(path,ice)
+
+
+def saveframet(framet):
+    path=os.getcwd()+'\\Data_save\\Simulation_data_sup\\framet'
+    np.save(path,framet)
+    
 
 
 # INITIALISATION VARIABLE 
@@ -338,6 +366,14 @@ def update_fron(fron_state,ice,mat_voi,dim_box,Lcell):
 mat_voi=np.array([[-1,-1,0],[0,-1,0],[-1,0,0],[1,0,0],[0,1,0],[1,1,0],[0,0,1],[0,0,-1]])
 
 
+mat_voi_con=np.zeros([3,3,3])
+
+mat_voi_con[1,1,0]=1
+mat_voi_con[1,1,2]=1
+
+mat_voi_con[:,:,1]=1
+mat_voi_con[0,2,1]=0
+mat_voi_con[2,0,1]=0
 # Constantes :
 
 
@@ -418,7 +454,7 @@ for i1 in range(0,6):
 
 
 #Initalisation de l etat de la frontiere 
-fronpos_ini=frontiere(ice_ini,mat_voi,dim_box)
+fronpos_ini=frontiere(ice_ini,mat_voi_con)
 
 fron_state=np.zeros([np.shape(fronpos_ini)[0],1])
 
@@ -434,14 +470,16 @@ fron_state=np.concatenate((fronpos_ini,fron_state),axis=1).astype(float)
 # SIMULATION
 ###############################################################################
 plt.rcParams["figure.figsize"] = (10,10)
-if True:
-    framev=[]
-    frameice=[]
+if False:
+    # framev=[]
+    # frameice=[]
     framet=[]
-    #framef=[]
+    # #framef=[]
     vap_ini=vap
-    frameice.append(ice_ini.copy())
-    framev.append(vap.copy())  #juste pour pas avoir tout commenter à chaque fois que je change de quoi
+    # frameice.append(ice_ini.copy())
+    # framev.append(vap.copy())  #juste pour pas avoir tout commenter à chaque fois que je change de quoi
+    saveframev(00,vap_ini)
+    saveframeice(00,ice_ini)
     continuer1=True
     i3=0    
     while continuer1:
@@ -457,8 +495,8 @@ if True:
             vap_c=relax1(vap_ini,ice_c,fron_state,dim_box,mat_voi,sigma_limit,Pos)
             i4=i4+1
             #relax1(vap,ice,fron_state,dim_box,mat_voi,Pos):
-            if ((abs((vap_c-vap_ini)/vap_ini))<0.01).all() : #and i4>=10:
-                framev.append(vap_c.copy())
+            if ((abs((vap_c-vap_ini)/vap_ini))<0.005).all() : #and i4>=10:
+                #framev.append(vap_c.copy())
                 vap_ini=vap_c
                 continuer2=False
                 print('nbr iteration pour convergence:')
@@ -470,7 +508,8 @@ if True:
                 print()
             else:
                 vap_ini=vap_c
-
+        
+        t1=time.time()
         t_min=tmin(fron_state,ice_c,vap_c,nu_kin,mat_voi,dim_box,Lcell)  
        # print(t_min)tmin(fron_state,ice,vap,nu_kin,mat_voi,dim_box,Lcell):
         fron_state_c=croissance(ice_c,fron_state,vap_c,delta_dim,mat_voi,dim_box,nu_kin,t_min)
@@ -483,9 +522,15 @@ if True:
         
         #crl !!!!!!!!!!!!!!!!!!!!
         #framef.append(fron_state.copy())
-        frameice.append(ice_ini.copy())
+        # frameice.append(ice_ini.copy())
         framet.append(t_min)
         i3=i3+1
+        saveframev(i3,vap_ini)
+        saveframeice(i3,ice_ini)
+        t2=time.time()
+        print('temp pour opperation croi et save:')
+        print(t2-t1)
+        print()
         if (fron_state==np.array([dim_box[0]-1,dim_box[1]-1,dim_box[2],np.nan])).any() or (fron_state==np.array([1,1,0,np.nan])).any():
             print('fin')
             continuer1=False
